@@ -1,12 +1,32 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
+      <Authentication />
+      <router-link to="/">Home</router-link>|
       <router-link to="/about">About</router-link>
     </div>
-    <router-view/>
+    <router-view />
   </div>
 </template>
+
+<script>
+import Authentication from "@/components/Authentication.vue";
+import firebase from "firebase";
+import { mapActions } from "vuex";
+export default {
+  components: {
+    Authentication
+  },
+  created() {
+    firebase.auth().onAuthStateChanged(user => {
+            this.setCurrentUser(user);
+        });
+  },
+  methods: {
+    ...mapActions(["setCurrentUser"]),
+  }
+};
+</script>
 
 <style>
 #app {
