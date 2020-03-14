@@ -8,6 +8,10 @@ export default new Vuex.Store({
   state: {
     user: null
   },
+  getters: {
+    user: state => state.user,
+    uid: state => state.user ? state.user.uid : null
+  },
   mutations: {
     setCurrentUser(state, user) {
       state.user = user;
