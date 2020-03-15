@@ -23,6 +23,8 @@
           src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
           width="100"
         />
+        <router-link class="linkFont" to="/">Home</router-link>|
+      <router-link class="linkFont" to="/about">About</router-link>
       </div>
 
       <v-spacer></v-spacer>
@@ -65,3 +67,9 @@ created() {
   }
 };
 </script>
+
+<style scoped>
+.linkFont {
+  color: white;
+}
+</style>
