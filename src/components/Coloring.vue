@@ -1,13 +1,17 @@
 <template>
   <div>
+    <input type="text" v-model="colorCode" /><span>{{ colorCode }}</span>
     <div class="flexBox">
       <div
         v-for="(cell, index) in cellLists"
         class="flexItem"
         @click="selectCell(index)"
         :class="{ cellCheck: cell.isActive }"
+        :style="{ 'background-color': cell.colorCode }"
         :key="index"
-      >{{ `index:${index} val:${cell.isActive}` }}</div>
+      >
+        {{ `index:${index} val:${cell.isActive}` }}
+      </div>
     </div>
     <button @click="checkAnythig()">なんでもチェック！</button>
   </div>
@@ -19,43 +23,35 @@ export default {
   name: "Coloring",
   data() {
     return {
-      cellLists: Array(12)
+      cellLists: Array(12),
+      colorCode: ""
     };
   },
   created() {
     for (let i = 0; i < this.cellLists.length; i++) {
-      this.$set(this.cellLists, i, { isActive: false, task: "none" });
+      this.$set(this.cellLists, i, { isActive: false, task: "" });
     }
     //   コンポーネント生成時にuserが認証済かどうか判断したい。
     console.log("ユーザ認証状況は：", this.$store.state.user);
+    this.featchRecords();
   },
   mounted() {
     this.$store.watch(
       (state, getters) => getters.user,
       (newValue, oldValue) => {
         console.log("user changed! %s => %s", oldValue, newValue);
-        // console.log(firebase.auth().currentUser,this.$store.state.user);
-        if (this.$store.state.user) {
-          firebase
-            .firestore()
-            .collection(`users/${this.$store.getters.uid}/records`)
-            .get()
-            .then(snapshot => {
-              snapshot.docs.forEach((doc, index) => {
-                this.$set(this.cellLists, index, {
-                  ...doc.data(),
-                  id: doc.id
-                  //   id: doc.id,
-                  //   cell: doc.data()
-                });
-                console.log("firestoreの値で更新", this.cellLists[index]);
-              });
-            });
-        } else {
-          console.log("未ログインのためデータ取得する不可");
-        }
+        this.featchRecords();
       }
     );
+  },
+  computed: {
+    activeCellObj() {
+      return {
+        isActive: true,
+        task: "work",
+        colorCode: this.colorCode
+      };
+    }
   },
   methods: {
     selectCell(index) {
@@ -73,7 +69,7 @@ export default {
             .delete()
             .then(() => {
               this.cellLists.splice(index, 1);
-              this.cellLists.push({ isActive: false, task: "none" });
+              this.cellLists.push({ isActive: false, task: "" });
             });
           // 対象セルが非アクティブの場合
         } else if (index === 0 || this.cellLists[index - 1].isActive === true) {
@@ -81,17 +77,17 @@ export default {
           firebase
             .firestore()
             .collection(`users/${this.$store.getters.uid}/records`)
-            .add({ isActive: true, task: "work" })
+            .add(this.activeCellObj)
+            // .add({ isActive: true, task: "work" })
             .then(doc => {
               this.$set(this.cellLists, index, {
-                isActive: true,
-                task: "work",
+                ...this.activeCellObj,
                 id: doc.id
               });
             });
         }
       } else {
-          alert("ログインしてくだい！");
+        alert("ログインしてくだい！");
       }
     },
     // 認証チェックメソッド
@@ -99,14 +95,39 @@ export default {
       console.log("ボタン押下::ユーザ認証状況は：", this.$store.state.user);
     },
     checkAnythig() {
-        this.cellLists[0].task.get().then(doc => console.log(doc.data()));
-        // this.cellLists[0].task.
+      this.cellLists[0].task.get().then(doc => console.log(doc.data()));
+    },
+    featchRecords() {
+      if (this.$store.state.user) {
+        //   TODO: 取得する時、タイムスタンプの昇順で取得する必要がある。
+        firebase
+          .firestore()
+          .collection(`users/${this.$store.getters.uid}/records`)
+          .get()
+          .then(snapshot => {
+            snapshot.docs.forEach((doc, index) => {
+              this.$set(this.cellLists, index, {
+                ...doc.data(),
+                id: doc.id
+                //   id: doc.id,
+                //   cell: doc.data()
+              });
+              console.log("firestoreの値で更新", this.cellLists[index]);
+            });
+          });
+      } else {
+        console.log("未ログインのためデータ取得する不可");
+      }
     }
   }
 };
 </script>
 
 <style scoped>
+input {
+  border: solid;
+}
+
 div.flexBox {
   display: flex;
   flex-wrap: wrap;
