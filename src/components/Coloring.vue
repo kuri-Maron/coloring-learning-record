@@ -24,12 +24,13 @@ export default {
   data() {
     return {
       cellLists: Array(12),
+      notActiveObj: { isActive: false, task: "" },
       colorCode: ""
     };
   },
   created() {
     for (let i = 0; i < this.cellLists.length; i++) {
-      this.$set(this.cellLists, i, { isActive: false, task: "" });
+      this.$set(this.cellLists, i, this.notActiveObj);
     }
     //   コンポーネント生成時にuserが認証済かどうか判断したい。
     console.log("ユーザ認証状況は：", this.$store.state.user);
@@ -69,7 +70,7 @@ export default {
             .delete()
             .then(() => {
               this.cellLists.splice(index, 1);
-              this.cellLists.push({ isActive: false, task: "" });
+              this.cellLists.push(this.notActiveObj);
             });
           // 対象セルが非アクティブの場合
         } else if (index === 0 || this.cellLists[index - 1].isActive === true) {
@@ -77,7 +78,10 @@ export default {
           firebase
             .firestore()
             .collection(`users/${this.$store.getters.uid}/records`)
-            .add(this.activeCellObj)
+            .add({
+              ...this.activeCellObj,
+              timeStamp: firebase.firestore.FieldValue.serverTimestamp()
+            })
             // .add({ isActive: true, task: "work" })
             .then(doc => {
               this.$set(this.cellLists, index, {
@@ -103,6 +107,7 @@ export default {
         firebase
           .firestore()
           .collection(`users/${this.$store.getters.uid}/records`)
+          .orderBy("timeStamp")
           .get()
           .then(snapshot => {
             snapshot.docs.forEach((doc, index) => {
