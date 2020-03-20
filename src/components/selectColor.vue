@@ -1,25 +1,11 @@
 <template>
   <div>
     <v-col cols="12" sm="6" class="py-2">
-      <p>Text Options</p>
-
       <v-btn-toggle v-model="activeColorText" tile color="black" mandatory dense>
         <!-- <v-btn-toggle v-model="text" tile color="deep-purple accent-3" group> -->
-        <v-btn value="green" color="#DCEDC8">
+        <v-btn v-for="colorObj in colorList" :key="colorObj.colorText" :value="colorObj" :color="colorObj.colorCode">
         <!-- <v-btn value="green" color="#DCEDC8" elevation="15"> -->
-          （緑）勉強
-        </v-btn>
-
-        <v-btn value="blue" color="#B3E5FC">
-          （青）座学
-        </v-btn>
-
-        <v-btn value="yellow" color="#FFF59D">
-          （黄）新挑戦
-        </v-btn>
-
-        <v-btn value="red" color="#FFCDD2">
-          （赤）筋トレ
+          {{colorObj.description}}
         </v-btn>
       </v-btn-toggle>
       <p>{{activeColorText}}</p>
@@ -31,20 +17,27 @@
 export default {
   data() {
     return {
-        colorList: ["green","blue","yellow","red"],
-      activeColorText: "green"
+        // colorList: ["green","blue","yellow","red"],
+        colorList: [{colorText: "green", colorCode: "#98fb98", description: "（緑）勉強"},
+                    {colorText: "blue", colorCode: "#B3E5FC", description: "（青）雑学"},
+                    {colorText: "yellow", colorCode: "#FFF59D", description: "（黄）新挑戦"},
+                    {colorText: "red", colorCode: "#FFCDD2", description: "（赤）筋トレ"},
+        ],
+        // TODO: こいつをvuexのstateに移植。
+      activeColorText: "red"
     };
   },
+  // TODO: これいらない説。最初から、各カラーObjで定義する
   computed: {
-      colorObj() {
-          let colorObj = {};
-          switch(this.activeColorText){
-              case this.activeColorText[0]:
-                  colorObj = {colorText: this.activeColorText[0]};
-                  break;
-          }
-          return colorObj;
-      }
+      // colorObj() {
+      //     let colorObj = {};
+      //     switch(this.activeColorText){
+      //         case this.activeColorText[0]:
+      //             colorObj = {colorText: this.activeColorText[0]};
+      //             break;
+      //     }
+      //     return colorObj;
+      // }
   },
   watch: {
 

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <input type="text" v-model="colorCode" /><span>{{ colorCode }}</span>
     <div class="flexBox">
       <div
         v-for="(cell, index) in cellLists"
@@ -13,7 +12,8 @@
         {{ `index:${index} val:${cell.isActive}` }}
       </div>
     </div>
-    <button @click="checkAnythig()">なんでもチェック！</button>
+    <input type="text" v-model="colorCode" /><span>{{ colorCode }}</span>
+    <!-- <button @click="checkAnythig()">なんでもチェック！</button> -->
   </div>
 </template>
 
@@ -117,10 +117,8 @@ export default {
                   this.$set(this.cellLists, index, {
                       ...doc.data(),
                 id: doc.id
-                //   id: doc.id,
-                //   cell: doc.data()
               });
-              console.log("firestoreの値で更新", this.cellLists[index]);
+              // console.log("firestoreの値で更新", this.cellLists[index]);
             });
           });
       } else {
@@ -149,6 +147,6 @@ div.flexBox {
 }
 
 .cellCheck {
-  background-color: palegreen;
+  background-color: #98fb98;
 }
 </style>
