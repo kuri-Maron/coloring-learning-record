@@ -3,11 +3,11 @@
     <!-- ログイン時のレイアウト -->
     <div v-if="user !== null" key="login">
       <p>{{user.displayName}}</p>
-      <button type="button" @click="logout()">Sign out</button>
+      <v-btn type="button" @click="logout()">Sign out</v-btn>
       <!-- ログアウト時のレイアウト -->
     </div>
     <div v-else key="logout">
-      <button type="button" @click="login()">Sign in with Google</button>
+      <v-btn type="button" @click="login()">Sign in with Google</v-btn>
     </div>
   </div>
 </template>

@@ -1,6 +1,7 @@
 <template>
   <div>
     <div class="flexBox">
+      <!-- TODO: v-if使う -->
       <div
         v-for="(cell, index) in cellLists"
         class="flexItem"
@@ -8,11 +9,10 @@
         :class="{ cellCheck: cell.isActive }"
         :style="{ 'background-color': cell.colorCode }"
         :key="index"
-      >
-        {{ `index:${index} val:${cell.isActive}` }}
-      </div>
+      >{{ `index:${index} val:${cell.isActive}` }}</div>
     </div>
-    <input type="text" v-model="colorCode" /><span>{{ colorCode }}</span>
+    <input type="text" v-model="colorCode" />
+    <span>{{ colorCode }}</span>
     <!-- <button @click="checkAnythig()">なんでもチェック！</button> -->
   </div>
 </template>
@@ -28,101 +28,104 @@ export default {
       colorCode: ""
     };
   },
-  created() {
+   async created() {
     for (let i = 0; i < this.cellLists.length; i++) {
       this.$set(this.cellLists, i, this.notActiveObj);
     }
     //   コンポーネント生成時にuserが認証済かどうか判断したい。
     console.log("ユーザ認証状況は：", this.$store.state.user);
-    // console.log("created");
-    this.featchRecords();
+  // TODO: API通信が終わる前に一度レンダリングされる原因について
+       await this.featchRecords();
   },
   mounted() {
-      this.$store.watch(
-          (state, getters) => getters.user,
+    // 途中ログイン、ログアウト操作に画面も対応させるため？
+    this.$store.watch(
+      (state, getters) => getters.user,
       (newValue, oldValue) => {
-          console.log("user changed! %s => %s", oldValue, newValue);
+        console.log("user changed! %s => %s", oldValue, newValue);
         this.featchRecords();
-    console.log("mounted");
+        console.log("mounted");
       }
     );
   },
   computed: {
-      activeCellObj() {
-          return {
-              isActive: true,
+    activeCellObj() {
+      return {
+        isActive: true,
         task: "work",
         colorCode: this.colorCode
       };
     }
   },
   methods: {
-      selectCell(index) {
-          if (this.$store.state.user) {
-              // 対象セルがアクティブの場合
+    selectCell(index) {
+      if (this.$store.state.user) {
+        // 対象セルがアクティブの場合
         if (
-            this.cellLists[index].isActive === true &&
+          this.cellLists[index].isActive === true &&
           this.cellLists[index].id !== null
         ) {
-            //   そのセルを削除して、配列の最後尾に非アクティブなセルを追加する
+          //   そのセルを削除して、配列の最後尾に非アクティブなセルを追加する
           firebase
             .firestore()
             .collection(`users/${this.$store.getters.uid}/records`)
             .doc(this.cellLists[index].id)
             .delete()
             .then(() => {
-                this.cellLists.splice(index, 1);
+              this.cellLists.splice(index, 1);
               this.cellLists.push(this.notActiveObj);
             });
           // 対象セルが非アクティブの場合
         } else if (index === 0 || this.cellLists[index - 1].isActive === true) {
-            //   対象セルをアクティブにするTODO: 今後はタイムスタンプとかドキュメントID も格納するかも
+          //   対象セルをアクティブにするTODO: 今後はタイムスタンプとかドキュメントID も格納するかも
           firebase
             .firestore()
             .collection(`users/${this.$store.getters.uid}/records`)
             .add({
-                ...this.activeCellObj,
+              ...this.activeCellObj,
               timeStamp: firebase.firestore.FieldValue.serverTimestamp()
             })
             // .add({ isActive: true, task: "work" })
             .then(doc => {
-                this.$set(this.cellLists, index, {
-                    ...this.activeCellObj,
+              this.$set(this.cellLists, index, {
+                ...this.activeCellObj,
                 id: doc.id
               });
             });
         }
       } else {
-          alert("ログインしてくだい！");
+        alert("ログインしてくだい！");
       }
     },
     // 認証チェックメソッド
     checkUserState() {
-        console.log("ボタン押下::ユーザ認証状況は：", this.$store.state.user);
+      console.log("ボタン押下::ユーザ認証状況は：", this.$store.state.user);
     },
     checkAnythig() {
-        this.cellLists[0].task.get().then(doc => console.log(doc.data()));
+      this.cellLists[0].task.get().then(doc => console.log(doc.data()));
     },
-    featchRecords() {
-        console.log("featchRecords");
+    async featchRecords() {
+      console.log("featchRecords");
       if (this.$store.state.user) {
-          //   TODO: 取得する時、タイムスタンプの昇順で取得する必要がある。
-        firebase
+        //   TODO: 取得する時、タイムスタンプの昇順で取得する必要がある。
+        await firebase
           .firestore()
           .collection(`users/${this.$store.getters.uid}/records`)
           .orderBy("timeStamp")
           .get()
           .then(snapshot => {
-              snapshot.docs.forEach((doc, index) => {
-                  this.$set(this.cellLists, index, {
-                      ...doc.data(),
+            snapshot.docs.forEach((doc, index) => {
+              this.$set(this.cellLists, index, {
+                ...doc.data(),
                 id: doc.id
               });
               // console.log("firestoreの値で更新", this.cellLists[index]);
             });
+            console.log('データセット完了');
           });
+          console.log('API取得完了？');
       } else {
-          console.log("未ログインのためデータ取得する不可");
+        console.log("未ログインのためデータ取得する不可");
       }
     }
   }
