@@ -2,9 +2,7 @@
   <div>
     <v-col cols="12" sm="6" class="py-2">
       <v-btn-toggle v-model="activeColorText" tile color="black" mandatory dense>
-        <!-- <v-btn-toggle v-model="text" tile color="deep-purple accent-3" group> -->
         <v-btn v-for="colorObj in colorList" :key="colorObj.colorText" :value="colorObj" :color="colorObj.colorCode">
-        <!-- <v-btn value="green" color="#DCEDC8" elevation="15"> -->
           {{colorObj.description}}
         </v-btn>
       </v-btn-toggle>
@@ -14,6 +12,8 @@
 </template>
 
 <script>
+// import { commit } from "vuex";
+// import { commit } from "vuex";
 export default {
   data() {
     return {
@@ -24,20 +24,21 @@ export default {
                     {colorText: "red", colorCode: "#FFCDD2", description: "（赤）筋トレ"},
         ],
         // TODO: こいつをvuexのstateに移植。
-      activeColorText: "red"
+      // activeColorText: "red"
     };
   },
   // TODO: これいらない説。最初から、各カラーObjで定義する
   computed: {
-      // colorObj() {
-      //     let colorObj = {};
-      //     switch(this.activeColorText){
-      //         case this.activeColorText[0]:
-      //             colorObj = {colorText: this.activeColorText[0]};
-      //             break;
-      //     }
-      //     return colorObj;
-      // }
+      activeColorText: {
+        get() {
+          return this.$store.state.activeColor.colorText;
+        },
+        set(value) {
+          console.log('セッター呼び出し！');
+          this.$store.commit('setColor',value);
+          // this.$store.state.commit('setColor',value);
+        }
+      }
   },
   watch: {
 

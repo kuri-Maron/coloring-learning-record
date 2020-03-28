@@ -7,7 +7,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     user: null,
-    seleectColor: {}
+    activeColor: {colorText: "red"}
   },
   getters: {
     user: state => state.user,
@@ -16,6 +16,9 @@ export default new Vuex.Store({
   mutations: {
     setCurrentUser(state, user) {
       state.user = user;
+    },
+    setColor(state,color) {
+      state.activeColor = color;
     }
   },
   actions: {
