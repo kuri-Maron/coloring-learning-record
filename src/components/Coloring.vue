@@ -1,7 +1,7 @@
 <template>
   <div>
+    <div>{{totalTime | timeNotation}}</div>
     <div class="flexBox">
-      <!-- TODO: v-if使う -->
       <div
         v-for="(cell, index) in cellLists"
         class="flexItem"
@@ -22,8 +22,9 @@ export default {
   name: "Coloring",
   data() {
     return {
-      cellLists: Array(12),
-      notActiveObj: { isActive: false, task: "" }
+      cellLists: Array(32),
+      notActiveObj: { isActive: false, task: "" },
+      // totalTime: 0
     };
   },
   async created() {
@@ -53,6 +54,11 @@ export default {
         task: this.$store.state.activeColor.description,
         colorCode: this.$store.state.activeColor.colorCode
       };
+    },
+    totalTime() {
+      return this.cellLists.filter(cell => {
+        return cell.isActive === true
+      }).length;
     }
   },
   methods: {
@@ -170,6 +176,15 @@ export default {
       } else {
         console.log("未ログインのためデータ取得する不可");
       }
+    }
+  },
+  filters: {
+    timeNotation(val) {
+      let totalMinutes = val * 15;
+      let hour = ('0' + Math.floor( totalMinutes / 60 )).slice(-2);
+      let minutes = ('0' + totalMinutes % 60).slice(-2);
+      
+      return `${hour}:${minutes}`;
     }
   }
 };
