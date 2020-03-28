@@ -1,6 +1,7 @@
 <template>
   <div>
     <v-col cols="12" sm="6" class="py-2">
+      <!-- <v-btn-toggle v-model="activeColorText" tile color="black" mandatory dense> -->
       <v-btn-toggle v-model="activeColorText" tile color="black" mandatory dense>
         <v-btn v-for="colorObj in colorList" :key="colorObj.colorText" :value="colorObj" :color="colorObj.colorCode">
           {{colorObj.description}}
@@ -13,11 +14,9 @@
 
 <script>
 // import { commit } from "vuex";
-// import { commit } from "vuex";
 export default {
   data() {
     return {
-        // colorList: ["green","blue","yellow","red"],
         colorList: [{colorText: "green", colorCode: "#98fb98", description: "（緑）勉強"},
                     {colorText: "blue", colorCode: "#B3E5FC", description: "（青）雑学"},
                     {colorText: "yellow", colorCode: "#FFF59D", description: "（黄）新挑戦"},
@@ -31,7 +30,7 @@ export default {
   computed: {
       activeColorText: {
         get() {
-          return this.$store.state.activeColor.colorText;
+          return this.$store.state.activeColor;
         },
         set(value) {
           console.log('セッター呼び出し！');
