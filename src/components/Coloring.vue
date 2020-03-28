@@ -11,9 +11,8 @@
         :key="index"
       >{{ `index:${index} val:${cell.isActive}` }}</div>
     </div>
-    <input type="text" v-model="colorCode" />
-    <span>{{ colorCode }}</span>
     <!-- <button @click="checkAnythig()">なんでもチェック！</button> -->
+    <v-btn type="button" @click="mergeCells()">マージ</v-btn>
   </div>
 </template>
 
@@ -24,18 +23,17 @@ export default {
   data() {
     return {
       cellLists: Array(12),
-      notActiveObj: { isActive: false, task: "" },
-      colorCode: ""
+      notActiveObj: { isActive: false, task: "" }
     };
   },
-   async created() {
+  async created() {
     for (let i = 0; i < this.cellLists.length; i++) {
       this.$set(this.cellLists, i, this.notActiveObj);
     }
     //   コンポーネント生成時にuserが認証済かどうか判断したい。
     console.log("ユーザ認証状況は：", this.$store.state.user);
-  // TODO: API通信が終わる前に一度レンダリングされる原因について
-       await this.featchRecords();
+    // TODO: API通信が終わる前に一度レンダリングされる原因について
+    await this.featchRecords();
   },
   mounted() {
     // 途中ログイン、ログアウト操作に画面も対応させるため？
@@ -52,8 +50,8 @@ export default {
     activeCellObj() {
       return {
         isActive: true,
-        task: "work",
-        colorCode: this.colorCode
+        task: this.$store.state.activeColor.description,
+        colorCode: this.$store.state.activeColor.colorCode
       };
     }
   },
@@ -104,6 +102,49 @@ export default {
     checkAnythig() {
       this.cellLists[0].task.get().then(doc => console.log(doc.data()));
     },
+    async mergeCells() {
+      alert("本当にリセットしますか？");
+      // 本当は、トランザクション処理をするべき箇所。
+      // forEachはasync,awaitに対応していない。
+
+      //    this.cellLists.forEach(cell => {
+      //   // cellにidがあるか判断する。
+      //   if (('id' in cell)) {
+      //     console.log("マージ処理実行開始");
+      //       firebase
+      //       .firestore()
+      //       .collection(`users/${this.$store.getters.uid}/records`)
+      //       .doc(cell.id)
+      //       .update({
+      //         isActive: false
+      //       })
+      //       .then(() => {
+      //         cell.isActive = false;
+      //       });
+      //   }
+      // });
+
+        for(let cell of this.cellLists) {
+          if (('id' in cell)) {
+          console.log("マージ処理実行開始");
+            await firebase
+            .firestore()
+            .collection(`users/${this.$store.getters.uid}/records`)
+            .doc(cell.id)
+            .update({
+              isActive: false
+            })
+            .then(() => {
+              cell.isActive = false;
+            });
+        }
+        }
+
+      location.reload();
+    },
+    firestoreReset() {
+
+    },
     async featchRecords() {
       console.log("featchRecords");
       if (this.$store.state.user) {
@@ -111,9 +152,11 @@ export default {
         await firebase
           .firestore()
           .collection(`users/${this.$store.getters.uid}/records`)
+          .where("isActive", "==", true)
           .orderBy("timeStamp")
           .get()
           .then(snapshot => {
+            // console.log(`取得件数は、${snapshot.size}です。`);
             snapshot.docs.forEach((doc, index) => {
               this.$set(this.cellLists, index, {
                 ...doc.data(),
@@ -121,9 +164,9 @@ export default {
               });
               // console.log("firestoreの値で更新", this.cellLists[index]);
             });
-            console.log('データセット完了');
+            console.log("データセット完了");
           });
-          console.log('API取得完了？');
+        console.log("API取得完了？");
       } else {
         console.log("未ログインのためデータ取得する不可");
       }
