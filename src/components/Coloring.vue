@@ -1,10 +1,12 @@
 <template>
   <div>
-    <div>{{totalTime | timeNotation}}</div>
+    <v-row align="center" justify="center">
+      <v-col class="text-center">{{totalTime | timeNotation}}</v-col>
+    </v-row>
     <div class="flexBox">
       <div
         v-for="(cell, index) in cellLists"
-        class="flexItem"
+        class="flexItem "
         @click="selectCell(index)"
         :class="{ cellCheck: cell.isActive }"
         :style="{ 'background-color': cell.colorCode }"
@@ -23,7 +25,7 @@ export default {
   data() {
     return {
       cellLists: Array(32),
-      notActiveObj: { isActive: false, task: "" },
+      notActiveObj: { isActive: false, task: "" }
       // totalTime: 0
     };
   },
@@ -57,7 +59,7 @@ export default {
     },
     totalTime() {
       return this.cellLists.filter(cell => {
-        return cell.isActive === true
+        return cell.isActive === true;
       }).length;
     }
   },
@@ -130,10 +132,10 @@ export default {
       //   }
       // });
 
-        for(let cell of this.cellLists) {
-          if (('id' in cell)) {
+      for (let cell of this.cellLists) {
+        if ("id" in cell) {
           console.log("マージ処理実行開始");
-            await firebase
+          await firebase
             .firestore()
             .collection(`users/${this.$store.getters.uid}/records`)
             .doc(cell.id)
@@ -144,13 +146,11 @@ export default {
               cell.isActive = false;
             });
         }
-        }
+      }
 
       location.reload();
     },
-    firestoreReset() {
-
-    },
+    firestoreReset() {},
     async featchRecords() {
       console.log("featchRecords");
       if (this.$store.state.user) {
@@ -181,9 +181,9 @@ export default {
   filters: {
     timeNotation(val) {
       let totalMinutes = val * 15;
-      let hour = ('0' + Math.floor( totalMinutes / 60 )).slice(-2);
-      let minutes = ('0' + totalMinutes % 60).slice(-2);
-      
+      let hour = ("0" + Math.floor(totalMinutes / 60)).slice(-2);
+      let minutes = ("0" + (totalMinutes % 60)).slice(-2);
+
       return `${hour}:${minutes}`;
     }
   }
@@ -202,7 +202,8 @@ div.flexBox {
 }
 
 .flexItem {
-  background-color: whitesmoke;
+  /* background-color: whitesmoke; */
+  background-color: #424242;
   width: 24vw;
   border: solid 1px;
 }
