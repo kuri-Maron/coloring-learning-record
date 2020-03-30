@@ -3,7 +3,7 @@
     <v-row align="center" justify="center">
       <v-col class="text-center display-1">{{totalTime | timeNotation}}</v-col>
     </v-row>
-    <div class="d-flex flex-wrap">
+    <div class="d-flex flex-wrap justify-center mainArea">
       <div
         v-for="(cell, index) in cellLists"
         class="flexItem"
@@ -13,7 +13,6 @@
         :key="index"
       ></div>
     </div>
-    <!-- <button @click="checkAnythig()">なんでもチェック！</button> -->
     <v-btn type="button" @click="mergeCells()">マージ</v-btn>
   </div>
 </template>
@@ -191,21 +190,23 @@ export default {
 </script>
 
 <style scoped>
+.mainArea {
+  height: 70vh;
+  background-color: rgb(195, 233, 29);
+}
 input {
   border: solid;
 }
-
 div.flexBox {
   display: flex;
   flex-wrap: wrap;
   width: 100vw;
 }
-
 .flexItem {
   /* background-color: whitesmoke; */
   background-color: #424242;
-  width: 24.7vw;
-  height: 7vh;
+  width: 24vw;
+  /* height: 7vh; */
   border: solid 1px;
   border-color: #2e7d32;
 }
