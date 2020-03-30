@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <select-color/>
+    <!-- <select-color/> -->
     <!-- <Coloring/> -->
     <!-- TODO: コンポ間で判定 -->
     <!-- <div v-show="status"></div> -->
@@ -11,11 +11,11 @@
 <script>
 // @ is an alias to /src
 import Coloring from "@/components/Coloring.vue";
-import SelectColor from '@/components/selectColor.vue';
+// import SelectColor from '@/components/selectColor.vue';
 export default {
   name: 'Home',
   components: {
-    SelectColor,
+    // SelectColor,
     Coloring
   }
 }

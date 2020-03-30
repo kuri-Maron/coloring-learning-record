@@ -192,7 +192,7 @@ export default {
 <style scoped>
 .mainArea {
   height: 70vh;
-  background-color: rgb(195, 233, 29);
+  /* background-color: rgb(195, 233, 29); */
 }
 input {
   border: solid;
@@ -205,10 +205,10 @@ div.flexBox {
 .flexItem {
   /* background-color: whitesmoke; */
   background-color: #424242;
-  width: 24vw;
+  width: 23vw;
   /* height: 7vh; */
   border: solid 1px;
-  border-color: #2e7d32;
+  border-color: #607D8B;
 }
 
 .cellCheck {

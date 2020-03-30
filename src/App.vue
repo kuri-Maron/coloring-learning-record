@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app >
+    <v-app-bar app>
       <div class="d-flex align-center">
         <!-- <v-img
           alt="Vuetify Logo"
@@ -25,11 +25,13 @@
         <router-view />
       </v-container>
     </v-content>
+      <select-color v-if="this.$route.meta.bottom"/>
   </v-app>
 </template>
 
 <script>
 import Authentication from "@/components/Authentication.vue";
+import SelectColor from "@/components/selectColor.vue";
 import firebase from "firebase";
 import { mapActions } from "vuex";
 
@@ -37,7 +39,8 @@ export default {
   name: "App",
 
   components: {
-    Authentication
+    Authentication,
+    SelectColor
   },
   created() {
     firebase.auth().onAuthStateChanged(user => {
