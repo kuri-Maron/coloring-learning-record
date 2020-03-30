@@ -1,14 +1,12 @@
 <template>
   <div>
-    <v-col cols="12" sm="6" class="py-2">
       <!-- <v-btn-toggle v-model="activeColorText" tile color="black" mandatory dense> -->
-      <v-btn-toggle v-model="activeColorText" tile color="black" mandatory dense>
-        <v-btn v-ripple v-for="colorObj in colorList" :key="colorObj.colorText" :value="colorObj" :color="colorObj.colorCode">
+      <v-btn-toggle v-model="activeColorText" color="black" mandatory >
+        <v-btn width="24.7vw" v-ripple v-for="colorObj in colorList" :key="colorObj.colorText" :value="colorObj" :color="colorObj.colorCode">
           {{colorObj.description}}
         </v-btn>
       </v-btn-toggle>
       <!-- <p>{{activeColorText}}</p> -->
-    </v-col>
   </div>
 </template>
 

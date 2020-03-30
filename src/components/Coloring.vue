@@ -1,17 +1,17 @@
 <template>
   <div>
     <v-row align="center" justify="center">
-      <v-col class="text-center">{{totalTime | timeNotation}}</v-col>
+      <v-col class="text-center display-1">{{totalTime | timeNotation}}</v-col>
     </v-row>
-    <div class="flexBox">
+    <div class="d-flex flex-wrap">
       <div
         v-for="(cell, index) in cellLists"
-        class="flexItem "
+        class="flexItem"
         @click="selectCell(index)"
         :class="{ cellCheck: cell.isActive }"
         :style="{ 'background-color': cell.colorCode }"
         :key="index"
-      >{{ `index:${index} val:${cell.isActive}` }}</div>
+      ></div>
     </div>
     <!-- <button @click="checkAnythig()">なんでもチェック！</button> -->
     <v-btn type="button" @click="mergeCells()">マージ</v-btn>
@@ -204,8 +204,10 @@ div.flexBox {
 .flexItem {
   /* background-color: whitesmoke; */
   background-color: #424242;
-  width: 24vw;
+  width: 24.7vw;
+  height: 7vh;
   border: solid 1px;
+  border-color: #2e7d32;
 }
 
 .cellCheck {
