@@ -1,7 +1,8 @@
 <template>
   <div>
-    <v-row align="center" justify="center">
+    <v-row style="position: relative" align="center" justify="center">
       <v-col class="text-center display-1">{{totalTime | timeNotation}}</v-col>
+      <v-btn absolute fab right color="pink" type="button" @click="mergeCells()"><v-icon>mdi-plus</v-icon></v-btn>
     </v-row>
     <div class="d-flex flex-wrap justify-center mainArea">
       <div
@@ -13,7 +14,7 @@
         :key="index"
       ></div>
     </div>
-    <v-btn type="button" @click="mergeCells()">マージ</v-btn>
+    
   </div>
 </template>
 

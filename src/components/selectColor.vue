@@ -1,8 +1,9 @@
 <template>
   <div>
       <!-- <v-btn-toggle v-model="activeColorText" color="black" mandatory > -->
-      <v-bottom-navigation app horizontal background-color="#121212" grow v-model="activeColorText" color="black" mandatory >
-        <v-btn v-ripple outlined v-for="colorObj in colorList" :key="colorObj.colorText" :value="colorObj" :color="colorObj.colorCode">
+      <v-bottom-navigation app  background-color="#121212" grow v-model="activeColorText" color="black" mandatory >
+        <!-- TODO: ボタン内のテキストとアイコンをレスポンシブ対応にする。 -->
+        <v-btn :class="{'caption': $vuetify.breakpoint.xs}" v-ripple outlined v-for="colorObj in colorList" :key="colorObj.colorText" :value="colorObj" :color="colorObj.colorCode">
           <span>{{colorObj.description}}</span>
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
@@ -16,10 +17,10 @@
 export default {
   data() {
     return {
-        colorList: [{colorText: "green", colorCode: "#4CAF50", description: "（緑）勉強", icon: "radiobox-marked"},
-                    {colorText: "blue", colorCode: "#3F51B5", description: "（青）雑学"},
-                    {colorText: "yellow", colorCode: "#FFAB00", description: "（黄）新挑戦"},
-                    {colorText: "red", colorCode: "#C62828", description: "（赤）筋トレ"},
+        colorList: [{colorText: "green", colorCode: "#4CAF50", description: "勉強", icon: "radiobox-marked"},
+                    {colorText: "blue", colorCode: "#3F51B5", description: "雑学"},
+                    {colorText: "yellow", colorCode: "#FFAB00", description: "新挑戦"},
+                    {colorText: "red", colorCode: "#C62828", description: "筋トレ"},
         ],
         // TODO: こいつをvuexのstateに移植。
       // activeColorText: "red"
