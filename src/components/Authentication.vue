@@ -1,14 +1,26 @@
 <template>
   <div class="d-flex align-center">
     <!-- ログイン時のレイアウト -->
-    <div class="d-flex align-center" v-if="user !== null" key="login">
+    <div class="d-flex align-center" v-if="$store.state.user !== null" key="login">
+      <!-- ログイン時のアイコン情報(このタグは、なくても表示はされる) -->
       <v-avatar max-height="100%">
-        <v-img class="shrink mr-2" contain max-width="50px" width="5vw" :src="user.photoURL"></v-img>
+        <!-- contain 属性は画像の切り取り不可 -->
+        <v-img
+          class="shrink mr-2"
+          contain
+          max-width="50px"
+          width="5vw"
+          :src="user.photoURL"
+        ></v-img>
       </v-avatar>
-      <span class="d-inline-block ma-3">{{user.displayName}}</span>
-      <v-btn class="ma-2" outlined type="button" @click="logout()">Sign out</v-btn>
-      <!-- ログアウト時のレイアウト -->
+      <!-- inline-block要素にする事で、margin設定している -->
+      <span class="d-inline-block ma-3">{{ user.displayName }}</span>
+      <v-btn class="ma-2" outlined type="button" @click="logout()"
+        >Sign out</v-btn
+      >
     </div>
+
+    <!-- ログアウト時のレイアウト -->
     <div v-else key="logout">
       <v-btn type="button" @click="login()">Sign in with Google</v-btn>
     </div>
@@ -17,20 +29,10 @@
 
 <script>
 import firebase from "firebase";
-import { mapActions } from "vuex";
+// import { mapActions } from "vuex";
+
 export default {
   name: "Authentication",
-  created() {
-    // ログイン状態の取得（TODO: App.vueに写して試す。マウントの関係で正常に実行できない）
-    // firebase.auth().onAuthStateChanged(user => {
-    //     this.setCurrentUser(user);
-    // });
-  },
-  computed: {
-    user() {
-      return this.$store.state.user;
-    }
-  },
   methods: {
     login() {
       const provider = new firebase.auth.GoogleAuthProvider();
@@ -39,7 +41,8 @@ export default {
     logout() {
       firebase.auth().signOut();
     },
-    ...mapActions(["setCurrentUser"])
+    // 認証状況判断のリスナーは、ルートコンポーネントで実装する
+    // ...mapActions(["setCurrentUser"])
   }
 };
 </script>
