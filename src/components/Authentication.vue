@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex align-center">
     <!-- ログイン時のレイアウト -->
-    <div class="d-flex align-center" v-if="$store.state.user !== null" key="login">
+    <div class="d-flex align-center" v-if="user !== null" key="login">
       <!-- ログイン時のアイコン情報(このタグは、なくても表示はされる) -->
       <v-avatar max-height="100%">
         <!-- contain 属性は画像の切り取り不可 -->
@@ -33,6 +33,12 @@ import firebase from "firebase";
 
 export default {
   name: "Authentication",
+  // vuexのstateから直接参照していると、不具合が起きているので、一旦、ローカルでもつ。
+  computed: {
+    user() {
+      return this.$store.state.user;
+    }
+  },
   methods: {
     login() {
       const provider = new firebase.auth.GoogleAuthProvider();
