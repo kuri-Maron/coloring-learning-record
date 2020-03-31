@@ -7,6 +7,7 @@ import vuetify from './plugins/vuetify';
 
 Vue.config.productionTip = false;
 
+// firebaseのコンフィグ TODO:今後はhostingURLを利用したい
 const firebaseConfig = {
   apiKey: "AIzaSyCJv9rgteA7J72JsDnxmJmlg7BDMIPgWIg",
   authDomain: "color-record-test.firebaseapp.com",
@@ -19,6 +20,7 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
+// ここに含めたパッケージは、this.$XXXで利用可能
 new Vue({
   router,
   store,
