@@ -8,6 +8,7 @@ const routes = [
   {
     path: '/',
     name: 'Home',
+    // meta 属性の正式な利用方法を把握していない
     meta: {bottom: true},
     component: Home
   },
@@ -27,4 +28,5 @@ const router = new VueRouter({
   routes
 })
 
+// 下記のrouterをmain.jsのコンストラクタに設定
 export default router

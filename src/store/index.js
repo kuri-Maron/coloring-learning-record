@@ -7,7 +7,6 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     user: null,
-    // activeColor: {colorText: "yellow", colorCode: "#FFF59D", description: "（黄）新挑戦"}
     activeColor: {}
   },
   getters: {
@@ -22,10 +21,12 @@ export default new Vuex.Store({
       state.activeColor = color;
     }
   },
+  // actionsの利用価値がピンとこない(ミューテーション呼ぶ前の事前処理にためか？)
   actions: {
     setCurrentUser({ commit }, user) {
       commit("setCurrentUser", user);
     },
   },
+  // 規模が大きくなったときの利用するのか？
   modules: {}
 });
