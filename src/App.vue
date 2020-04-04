@@ -3,6 +3,7 @@
     <v-app-bar app>
       <div class="d-flex align-center">
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+        <v-toolbar-title>学習記録</v-toolbar-title>
       </div>
       <v-spacer></v-spacer>
       <!-- 認証機能コンポーネント -->

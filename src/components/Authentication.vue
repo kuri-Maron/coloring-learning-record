@@ -15,7 +15,7 @@
       </v-avatar>
       <!-- inline-block要素にする事で、margin設定している -->
       <span class="d-inline-block ma-3">{{ user.displayName }}</span>
-      <v-btn class="ma-2" outlined type="button" @click="logout()"
+      <v-btn class="pa-2" outlined type="button" @click="logout()"
         >Sign out</v-btn
       >
     </div>
