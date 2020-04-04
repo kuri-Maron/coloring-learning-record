@@ -1,20 +1,39 @@
 <template>
   <div>
+    <!-- 作業時間表示部 -->
     <v-row style="position: relative" align="center" justify="center">
-      <v-col class="text-center display-1">{{totalTime | timeNotation}}</v-col>
-      <v-btn absolute fab right color="pink" type="button" @click="mergeCells()"><v-icon>mdi-plus</v-icon></v-btn>
+      <v-col class="text-center display-1">
+        {{
+        totalTime | timeNotation
+        }}
+      </v-col>
+      <v-dialog v-model="dialog" max-width="290">
+        <template v-slot:activator="{ on }">
+        <!-- 現在のcell情報をDBに格納して、リセットボタン -->
+        <v-btn absolute right fab color="pink" type="button"  v-on="on"><v-icon>mdi-plus</v-icon></v-btn>
+      </template>
+       <v-card>
+        <v-card-title class="headline">合計時間に加算しますか？</v-card-title>
+        <v-card-text>このページ内の合計時間を全期間データに集計して、ページをリセットします。</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="dialog = false">No</v-btn>
+          <v-btn color="green darken-1" text @click="mergeCells(); dialog = false">Yes</v-btn>
+        </v-card-actions>
+      </v-card>
+      </v-dialog>
     </v-row>
+
     <div class="d-flex flex-wrap justify-center mainArea">
+      <!-- :class="{ cellCheck: cell.isActive }" を属性に含め、動的クラス可能 -->
       <div
         v-for="(cell, index) in cellLists"
         class="flexItem"
-        @click="selectCell(index)"
-        :class="{ cellCheck: cell.isActive }"
         :style="{ 'background-color': cell.colorCode }"
         :key="index"
+        @click="selectCell(index)"
       ></div>
     </div>
-    
   </div>
 </template>
 
@@ -24,32 +43,15 @@ export default {
   name: "Coloring",
   data() {
     return {
+      // 固定長の配列を定義
       cellLists: Array(32),
-      notActiveObj: { isActive: false, task: "" }
-      // totalTime: 0
+      // これはコードの重複を避けるために、定義したがdataオプションに定義しないほうが良いかも
+      notActiveObj: { isActive: false, task: "" },
+      dialog: false
     };
   },
-  async created() {
-    for (let i = 0; i < this.cellLists.length; i++) {
-      this.$set(this.cellLists, i, this.notActiveObj);
-    }
-    //   コンポーネント生成時にuserが認証済かどうか判断したい。
-    console.log("ユーザ認証状況は：", this.$store.state.user);
-    // TODO: API通信が終わる前に一度レンダリングされる原因について
-    await this.featchRecords();
-  },
-  mounted() {
-    // 途中ログイン、ログアウト操作に画面も対応させるため？
-    this.$store.watch(
-      (state, getters) => getters.user,
-      (newValue, oldValue) => {
-        console.log("user changed! %s => %s", oldValue, newValue);
-        this.featchRecords();
-        console.log("mounted");
-      }
-    );
-  },
   computed: {
+    // vuexのstateの情報を元に、動的に生成
     activeCellObj() {
       return {
         isActive: true,
@@ -57,14 +59,37 @@ export default {
         colorCode: this.$store.state.activeColor.colorCode
       };
     },
+    // 合計時間表示用
     totalTime() {
       return this.cellLists.filter(cell => {
         return cell.isActive === true;
       }).length;
     }
   },
+  async created() {
+    // 配列の長さしか定義されていないので、初期化
+    for (let i = 0; i < this.cellLists.length; i++) {
+      this.$set(this.cellLists, i, this.notActiveObj);
+    }
+
+    // TODO: API通信が終わる前に一度レンダリングされる原因について
+    // firestoreにデータを取りに行く
+    await this.featchRecords();
+  },
+  mounted() {
+    // TODO: console.logを見ながら、今度動きを確認する
+    // 途中ログイン、ログアウト操作に画面も対応させるため？
+    this.$store.watch(
+      (state, getters) => getters.user,
+      (newValue, oldValue) => {
+        console.log("user changed! %s => %s", oldValue, newValue);
+        this.featchRecords();
+      }
+    );
+  },
   methods: {
     selectCell(index) {
+      // ログイン時のみ実行可能
       if (this.$store.state.user) {
         // 対象セルがアクティブの場合
         if (
@@ -83,7 +108,7 @@ export default {
             });
           // 対象セルが非アクティブの場合
         } else if (index === 0 || this.cellLists[index - 1].isActive === true) {
-          //   対象セルをアクティブにするTODO: 今後はタイムスタンプとかドキュメントID も格納するかも
+          //   対象セルをアクティブにする
           firebase
             .firestore()
             .collection(`users/${this.$store.getters.uid}/records`)
@@ -91,7 +116,6 @@ export default {
               ...this.activeCellObj,
               timeStamp: firebase.firestore.FieldValue.serverTimestamp()
             })
-            // .add({ isActive: true, task: "work" })
             .then(doc => {
               this.$set(this.cellLists, index, {
                 ...this.activeCellObj,
@@ -103,54 +127,44 @@ export default {
         alert("ログインしてくだい！");
       }
     },
-    // 認証チェックメソッド
-    checkUserState() {
-      console.log("ボタン押下::ユーザ認証状況は：", this.$store.state.user);
-    },
-    checkAnythig() {
-      this.cellLists[0].task.get().then(doc => console.log(doc.data()));
-    },
     async mergeCells() {
-      alert("本当にリセットしますか？");
-      // 本当は、トランザクション処理をするべき箇所。
-      // forEachはasync,awaitに対応していない。
-
-      //    this.cellLists.forEach(cell => {
-      //   // cellにidがあるか判断する。
-      //   if (('id' in cell)) {
-      //     console.log("マージ処理実行開始");
-      //       firebase
-      //       .firestore()
-      //       .collection(`users/${this.$store.getters.uid}/records`)
-      //       .doc(cell.id)
-      //       .update({
-      //         isActive: false
-      //       })
-      //       .then(() => {
-      //         cell.isActive = false;
-      //       });
-      //   }
-      // });
-
-      for (let cell of this.cellLists) {
+      // forEachはasync非対応みたい
+      for (let [index, cell] of this.cellLists.entries()) {
+        // id属性が含まれているかチェック
         if ("id" in cell) {
           console.log("マージ処理実行開始");
+          // 一個ずつ更新→ローカル反映しているが、もっといいロジックがあるかも
           await firebase
             .firestore()
             .collection(`users/${this.$store.getters.uid}/records`)
             .doc(cell.id)
+            // TODO: notActiveObjをthis.$setするほうがよくね
             .update({
               isActive: false
             })
             .then(() => {
-              cell.isActive = false;
+              // もっと良い実装があるはず。
+              this.$set(this.cellLists, index, this.notActiveObj);
             });
         }
       }
-
-      location.reload();
+      // Promise.allの使い方把握しなければ
+      // Promise.all(
+      //   this.cellLists.forEach(async (cell, index) => {
+      //     if ("id" in cell) {
+      //       await firebase
+      //         .firestore()
+      //         .collection(`users/${this.$store.getters.uid}/records`)
+      //         .doc(cell.id)
+      //         .update({ isActive: false });
+      //     console.log("awaitご");
+      //     alert("stop");
+      //         this.$set(this.cellLists,index,this.notActiveObj);
+      //     }
+      //   })
+      // );
+      // location.reload();
     },
-    firestoreReset() {},
     async featchRecords() {
       console.log("featchRecords");
       if (this.$store.state.user) {
@@ -195,24 +209,22 @@ export default {
   height: 70vh;
   /* background-color: rgb(195, 233, 29); */
 }
-input {
-  border: solid;
+.flexItem {
+  /* もっと良いサイズ指定方法があるはず */
+  width: 23vw;
+  background-color: #424242;
+  border: solid 1px;
+  border-color: #607d8b;
 }
-div.flexBox {
+/* 現状未使用： アドオンでアクティブセルのレイアウト作り込みするために利用 */
+/* .cellCheck {
+  background-color: #98fb98;
+} */
+
+/* 生cssでflexを実装する場合 */
+/* div.flexBox {
   display: flex;
   flex-wrap: wrap;
   width: 100vw;
-}
-.flexItem {
-  /* background-color: whitesmoke; */
-  background-color: #424242;
-  width: 23vw;
-  /* height: 7vh; */
-  border: solid 1px;
-  border-color: #607D8B;
-}
-
-.cellCheck {
-  background-color: #98fb98;
-}
+} */
 </style>

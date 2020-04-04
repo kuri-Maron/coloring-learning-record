@@ -2,14 +2,30 @@
   <v-app>
     <v-app-bar app>
       <div class="d-flex align-center">
-        <!-- TODO: この丸出しのメニューをvuetifyのコンポーネント使用してレイアウト調整する -->
-        <router-link class="linkFont" to="/">Home</router-link>|
-        <router-link class="linkFont" to="/about">About</router-link>
+        <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       </div>
       <v-spacer></v-spacer>
       <!-- 認証機能コンポーネント -->
       <Authentication />
     </v-app-bar>
+
+    <!-- サイドナビバー TODO: 単一コンポーネント化@drawer扱い-->
+    <v-navigation-drawer v-model="drawer" absolute bottom temporary>
+      <!-- ここにログイン情報を表示するか検討 -->
+      <!-- <template v-slot:prepend>
+       </template>
+      <v-divider></v-divider>-->
+      <v-list>
+        <v-list-item v-for="item in items" :key="item.title" :to="item.link">
+          <v-list-item-icon>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
 
     <v-content>
       <!-- コンテナーを横に広げる -->
@@ -34,6 +50,16 @@ export default {
   components: {
     Authentication,
     SelectColor
+  },
+  data() {
+    return {
+      drawer: false,
+      items: [
+        { title: "Home", icon: "mdi-home", link: { name: "Home" } },
+        { title: "About", icon: "mdi-information", link: { name: "About" } },
+        { title: "Analysis", icon: "mdi-google-analytics" }
+      ]
+    };
   },
   created() {
     // 認証状態の判別
