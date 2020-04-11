@@ -11,11 +11,7 @@
     </v-app-bar>
 
     <!-- サイドナビバー TODO: 単一コンポーネント化@drawer扱い-->
-    <v-navigation-drawer v-model="drawer" absolute bottom temporary>
-      <!-- ここにログイン情報を表示するか検討 -->
-      <!-- <template v-slot:prepend>
-       </template>
-      <v-divider></v-divider>-->
+    <v-navigation-drawer v-model="drawer" absolute  temporary>
       <v-list>
         <v-list-item v-for="item in items" :key="item.title" :to="item.link">
           <v-list-item-icon>
