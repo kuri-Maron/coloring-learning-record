@@ -24,6 +24,7 @@
       </v-dialog>
     </v-row>
 
+<!-- v-responsiveとGridの組み合わせで下記みたいに無理やり折り返さなくても升目組めるかも（vuetifyのgridのDocment -->
     <div class="d-flex flex-wrap justify-center mainArea">
       <!-- :class="{ cellCheck: cell.isActive }" を属性に含め、動的クラス可能 -->
       <div

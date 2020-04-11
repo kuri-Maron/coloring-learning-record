@@ -58,7 +58,7 @@ export default {
       items: [
         { title: "Home", icon: "mdi-home", link: { name: "Home" } },
         { title: "About", icon: "mdi-information", link: { name: "About" } },
-        { title: "Analysis", icon: "mdi-google-analytics" }
+        { title: "Analysis", icon: "mdi-google-analytics", link: {name: "Analysis"} }
       ]
     };
   },
