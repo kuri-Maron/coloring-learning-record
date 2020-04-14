@@ -7,37 +7,47 @@ const db = admin.firestore();
 exports.countUp = functions
   .region("asia-northeast1")
   .firestore.document("users/{user}/records/{record}")
-  .onCreate((change, context) => {
+  .onCreate((snapShot, context) => {
     const FieldValue = admin.firestore.FieldValue;
     const userPath = context.params.user;
-    const countTarget = change.data().colorCode; 
+    const countTarget = snapShot.data().colorCode;
 
-    return db
-      .doc(`users/${userPath}`)
-      .set({[`count_${countTarget}`]: FieldValue.increment(1)},{merge: true});
+    return db.doc(`users/${userPath}/cellsInformation/cell_${countTarget}`).set(
+      {
+        count: FieldValue.increment(1),
+        task: snapShot.data().task,
+        colorCode: snapShot.data().colorCode,
+      },
+      { merge: true }
+    );
     //   .update("docCount", FieldValue.increment(1));
   });
 
 //   TODO: マイナス値のバリデーション実装が分からない。。。＠getとして値判断してみたいなことはできるかもしれんが、readコストが。。
-  exports.countDown = functions
+exports.countDown = functions
   .region("asia-northeast1")
   .firestore.document("users/{user}/records/{record}")
-  .onDelete((change, context) => {
+  .onDelete((snapShot, context) => {
     const FieldValue = admin.firestore.FieldValue;
     const userPath = context.params.user;
-    const countTarget = change.data().colorCode;
+    const countTarget = snapShot.data().colorCode;
 
-    return db
-      .doc(`users/${userPath}`)
-      .set({[`count_${countTarget}`]: FieldValue.increment(-1)},{merge: true});
+    return db.doc(`users/${userPath}/cellsInformation/cell_${countTarget}`).set(
+      {
+        count: FieldValue.increment(-1),
+        task: snapShot.data().task,
+        colorCode: snapShot.data().colorCode,
+      },
+      { merge: true }
+    );
     //   .update("docCount", FieldValue.increment(1));
-  });  
+  });
 
 //   トリガーされる順番が不確実だし、そもそもいきなりサブコレクション作ったとき発火しないっぽい
 // exports.initUserInformation = functions
 //   .region("asia-northeast1")
 //   .firestore.document("users/{user}")
-//   .onCreate((change, context) => {
+//   .onCreate((snapShot, context) => {
 //     const userPath = context.params.user;
 //     return db.doc(`users/${userPath}`).set({ docCount: 0 });
 //   });
