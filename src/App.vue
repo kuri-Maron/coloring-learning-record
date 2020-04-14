@@ -27,7 +27,7 @@
     <v-content>
       <!-- コンテナーを横に広げる -->
       <v-container fluid>
-        <router-view />
+        <router-view v-if="$store.state.user"/>
       </v-container>
     </v-content>
     <!-- metaにbottomが設定されているviewだけボトムバーを表示 -->
