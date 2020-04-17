@@ -5,7 +5,7 @@
     </v-card>
 
     <v-row align="center" justify="space-around" style="height: 95%;">
-      <v-col cols="10" md="5" :style="`height: ${viewportHeight};`">
+      <!-- <v-col cols="10" md="5" :style="`height: ${viewportHeight};`">
         <v-card class="card pa-2">
           <v-card-title>総合計時間</v-card-title>
           <div class="card-content d-flex align-center pb-10">
@@ -14,14 +14,12 @@
             >
           </div>
         </v-card>
-      </v-col>
+      </v-col> -->
 
       <v-col cols="10" md="5" :style="`height: ${viewportHeight};`">
         <!-- <v-card class="card pa-2"> -->
         <v-card class="card d-flex align-center justify-center pb-5">
           <!-- コピペwindow -->
-          <!-- <v-card-title>総合計時間</v-card-title> -->
-          <!-- <div class="card-content d-flex flex-column justify-center purple" style="width: 500px"> -->
           <div class="card-content d-flex flex-column justify-center">
             <v-window v-model="onboarding">
               <v-window-item
@@ -67,6 +65,10 @@
           </div>
         </v-card>
       </v-col>
+
+      <v-col cols="10" md="5" :style="`height: ${viewportHeight};`">
+        <v-card class="card pa-2"> </v-card>
+      </v-col>
     </v-row>
   </v-sheet>
 </template>
@@ -78,11 +80,12 @@ export default {
     return {
       length: 3,
       onboarding: 0,
-      cellsCountData: [{
+      cellsCountData: [
+        {
           count: 0,
-          task: '総合計時間',
-
-      }],
+          task: "総合計時間",
+        },
+      ],
     };
   },
   async created() {
@@ -158,15 +161,15 @@ export default {
           : this.onboarding - 1;
     },
   },
-   filters: {
+  filters: {
     timeNotation(val) {
       let totalMinutes = val * 15;
       let hour = ("0" + Math.floor(totalMinutes / 60)).slice(-2);
       let minutes = ("0" + (totalMinutes % 60)).slice(-2);
 
       return `${hour}:${minutes}`;
-    }
-  }
+    },
+  },
 };
 </script>
 
