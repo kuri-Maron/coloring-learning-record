@@ -1,7 +1,8 @@
 <template>
   <!-- <div class="chart-container" style="position: relative; height:40vh; width:80vw"> -->
-  <div class="chart-container" >
-    <pie-chart :chartData="chartData" :options="chartOptions"/>
+  <div class="chart-container">
+    <pie-chart :chartData="chartData" :options="chartOptions" :styles="myStyles"/>
+    <button @click="increase()">Increase height</button>
     <!-- <p>{{ chartData }}</p> -->
   </div>
 </template>
@@ -14,31 +15,27 @@ export default {
     PieChart
   },
   props: ["countCellDatas"],
-  // data() {
-  //   return {
-  //     chartData: {
-  //       labels: ["A","B","C"],
-  //       datasets: [
-  //         {
-  //           label: "Sample1",
-  //           data: [5,3,1],
-  //           backgroundColor: ["#3F51B5","#4CAF50","pink"],
-  //           borderWidth: 1
-  //         }
-  //       ]
-  //     }
-  //   };
-  // },
   data() {
     return {
+      height: 200,
       chartOptions: {
         responsive: true,
         maintainAspectRatio: false
       }
     };
   },
-
+  methods: {
+    increase() {
+      this.height += 10;
+    }
+  },
   computed: {
+    myStyles() {
+      return {
+        height: `${this.height}px`,
+        position: "relative"
+      };
+    },
     chartData() {
       const countData = this.countCellDatas.map(cellData => {
         return cellData.count;
@@ -49,16 +46,7 @@ export default {
         labels: this.countCellDatas.map(cellData => {
           return cellData.task;
         }),
-        datasets: [
-          // {
-          //   label: "Sample1",
-          //   // data: this.countCellDatas.map(cellData => {return cellData.count}),
-          //   data: [8,9],
-          //   // backgroundColor: this.countCellDatas.map(cellData => cellData.colorCode),
-          //   backgroundColor: ["red","blue"],
-          //   borderWidth: 1
-          // }
-        ]
+        datasets: []
       };
       this.$set(obj.datasets, 0, {
         // data: this.countCellDatas.map(cellData => {return cellData.count}),
@@ -71,24 +59,6 @@ export default {
       return obj;
     }
   }
-
-  // created() {
-  //   console.log("###: ",this.countCellDatas);
-  //   // ラベルのセット
-  //   this.chartData.labels = this.countCellDatas.map(cellData => {
-  //     return cellData.key;
-  //   });
-
-  //   // 値のセット
-  //   this.chartData.datasets[0].data = this.countCellDatas.map(cellData => {
-  //     return cellData.value;
-  //   });
-
-  //   // backgroundColorのセット
-  //   this.chartData.datasets[0].backgroundColor = this.countCellDatas.map(cellData => {
-  //     return cellData.color;
-  //   });
-  // }
 };
 </script>
 
