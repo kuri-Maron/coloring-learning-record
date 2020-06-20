@@ -1,8 +1,8 @@
 <template>
   <!-- <div class="chart-container" style="position: relative; height:40vh; width:80vw"> -->
   <div class="chart-container">
-    <pie-chart :chartData="chartData" :options="chartOptions" :styles="myStyles"/>
     <button @click="increase()">Increase height</button>
+    <pie-chart :chartData="chartData" :options="chartOptions" :styles="myStyles" />
     <!-- <p>{{ chartData }}</p> -->
   </div>
 </template>
@@ -17,7 +17,7 @@ export default {
   props: ["countCellDatas"],
   data() {
     return {
-      height: 200,
+      height: 90,
       chartOptions: {
         responsive: true,
         maintainAspectRatio: false
@@ -32,7 +32,7 @@ export default {
   computed: {
     myStyles() {
       return {
-        height: `${this.height}px`,
+        height: `${this.height}%`,
         position: "relative"
       };
     },
@@ -62,4 +62,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.chart-container {
+  height: 100%;
+}
+</style>
