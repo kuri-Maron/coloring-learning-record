@@ -1,5 +1,6 @@
 <template>
   <v-sheet color="pink" max-height="90vh" height="89vh" min-height="600px">
+    <!-- <v-sheet color="pink" max-height="90vh" height="89vh"> -->
     <v-card class="ma-auto text-center" max-width="50vmin">{{ imageHeight }}</v-card>
 
     <v-row align="center" justify="space-around" style="height: 95%;">
@@ -65,7 +66,7 @@
       <v-col cols="10" md="5" :style="`height: ${viewportHeight};`">
         <v-card class="card pa-2">
           <!-- <graph-view :countCellDatas="propsCountCellDatas" class="pie-chart"/> -->
-          <graph-view :countCellDatas="propsCountCellDatas"/>
+          <graph-view :countCellDatas="propsCountCellDatas" />
         </v-card>
       </v-col>
     </v-row>
@@ -122,7 +123,7 @@ export default {
       // console.log(querySnapshot);
       querySnapshot.forEach(doc => {
         this.countCellDatas.push(doc.data());
-        this.countCellDatas[0].count++;
+        this.countCellDatas[0].count += doc.data().count;
       });
       // console.log(this.countCellDatas);
       // this.countCellDatas = { ...querySnapshot.data()};
