@@ -24,12 +24,12 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-content>
+    <v-main>
       <!-- コンテナーを横に広げる -->
       <v-container fluid>
         <router-view v-if="$store.state.user"/>
       </v-container>
-    </v-content>
+    </v-main>
     <!-- metaにbottomが設定されているviewだけボトムバーを表示 -->
     <select-color v-if="this.$route.meta.bottom" />
   </v-app>
@@ -38,7 +38,8 @@
 <script>
 import Authentication from "@/components/Authentication.vue";
 import SelectColor from "@/components/selectColor.vue";
-import firebase from "firebase";
+import firebase from "firebase/app";
+import "firebase/auth";
 import { mapActions } from "vuex";
 
 export default {
