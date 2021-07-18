@@ -1,7 +1,10 @@
 <template>
   <v-sheet color="pink" max-height="90vh" height="89vh" min-height="600px">
     <!-- <v-sheet color="pink" max-height="90vh" height="89vh"> -->
-    <v-card class="ma-auto text-center" max-width="50vmin">{{ imageHeight }}</v-card>
+    <!-- 下記のカードはレイアウト確認用のノードなので、消して良い -->
+    <v-card class="ma-auto text-center" max-width="50vmin">{{
+      imageHeight
+    }}</v-card>
 
     <v-row align="center" justify="space-around" style="height: 95%;">
       <!-- <v-col cols="10" md="5" :style="`height: ${viewportHeight};`">
@@ -21,12 +24,13 @@
           <!-- コピペwindow -->
           <div class="card-content d-flex flex-column justify-center">
             <v-window v-model="onboarding">
-              <v-window-item v-for="(value, index) in countCellDatas" :key="`card-${index}`">
+              <v-window-item
+                v-for="(value, index) in countCellDatas"
+                :key="`card-${index}`"
+              >
                 <v-row align="center" justify="center" tag="v-card-text">
                   <v-card-text class="text-center">
-                    {{
-                    value.task
-                    }}
+                    {{ value.taskText }}
                   </v-card-text>
                 </v-row>
                 <!-- tag="v-card-text" これ何？ -->
@@ -34,7 +38,8 @@
                   <v-card-text
                     style="font-size: 10vmin;"
                     class="text-center white--text"
-                  >{{ value.count | timeNotation }}</v-card-text>
+                    >{{ value.count | timeNotation }}</v-card-text
+                  >
                 </v-row>
               </v-window-item>
             </v-window>
@@ -98,9 +103,11 @@
 import firebase from "firebase/app";
 import "firebase/firestore";
 import GraphView from "@/components/GraphView.vue";
+import getColorCode from "@/common/get-color-code";
+
 export default {
   components: {
-    GraphView
+    GraphView,
   },
   data() {
     return {
@@ -109,9 +116,9 @@ export default {
       countCellDatas: [
         {
           count: 0,
-          task: "総合計時間"
-        }
-      ]
+          taskText: "総合計時間",
+        },
+      ],
     };
   },
   async created() {
@@ -119,14 +126,20 @@ export default {
     if (this.$store.state.user) {
       const querySnapshot = await firebase
         .firestore()
-        .collection(`users/${this.$store.getters.uid}/cellsInformation`)
+        .collection(`users/${this.$store.getters.uid}/taskList`)
+        .where("selecting", "==", true)
         .get();
       // console.log(querySnapshot);
-      querySnapshot.forEach(doc => {
-        this.countCellDatas.push(doc.data());
-        this.countCellDatas[0].count += doc.data().count;
+      querySnapshot.forEach((doc) => {
+        const docData = doc.data();
+        this.countCellDatas.push({
+          taskText: docData.taskText,
+          count: docData.count,
+          colorCode: getColorCode(docData.color),
+        });
+        this.countCellDatas[0].count += docData.count;
       });
-      // console.log(this.countCellDatas);
+      console.log(this.countCellDatas);
       // this.countCellDatas = { ...querySnapshot.data()};
       // console.log(this.countCellDatas);
     }
@@ -137,7 +150,7 @@ export default {
 
   computed: {
     propsCountCellDatas() {
-      return this.countCellDatas.map(countCellData => countCellData).slice(1);
+      return this.countCellDatas.map((countCellData) => countCellData).slice(1);
     },
     viewportHeight() {
       let height = "";
@@ -167,7 +180,7 @@ export default {
           return "xl)800px";
       }
       return 0;
-    }
+    },
   },
   methods: {
     next() {
@@ -181,7 +194,7 @@ export default {
         this.onboarding - 1 < 0
           ? this.countCellDatas.length - 1
           : this.onboarding - 1;
-    }
+    },
   },
   filters: {
     timeNotation(val) {
@@ -190,8 +203,7 @@ export default {
       let minutes = ("0" + (totalMinutes % 60)).slice(-2);
 
       return `${hour}:${minutes}`;
-    }
-  }
+    },
+  },
 };
 </script>
-

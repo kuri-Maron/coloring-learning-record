@@ -7,19 +7,23 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     user: null,
-    activeColor: {}
+    activeColor: {},
+    mappingTaskandColor: {},
   },
   getters: {
-    user: state => state.user,
-    uid: state => state.user ? state.user.uid : null
+    user: (state) => state.user,
+    uid: (state) => (state.user ? state.user.uid : null),
   },
   mutations: {
     setCurrentUser(state, user) {
       state.user = user;
     },
-    setColor(state,color) {
+    setColor(state, color) {
       state.activeColor = color;
-    }
+    },
+    setMappingTaskAndColor(state, mappingValue) {
+      state.mappingTaskandColor = mappingValue;
+    },
   },
   // actionsの利用価値がピンとこない(ミューテーション呼ぶ前の事前処理にためか？)
   actions: {
@@ -28,5 +32,5 @@ export default new Vuex.Store({
     },
   },
   // 規模が大きくなったときの利用するのか？
-  modules: {}
+  modules: {},
 });

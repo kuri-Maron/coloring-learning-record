@@ -11,7 +11,7 @@
     </v-app-bar>
 
     <!-- サイドナビバー TODO: 単一コンポーネント化@drawer扱い-->
-    <v-navigation-drawer v-model="drawer" absolute  temporary>
+    <v-navigation-drawer v-model="drawer" absolute temporary>
       <v-list>
         <v-list-item v-for="item in items" :key="item.title" :to="item.link">
           <v-list-item-icon>
@@ -27,11 +27,11 @@
     <v-main>
       <!-- コンテナーを横に広げる -->
       <v-container fluid>
-        <router-view v-if="$store.state.user"/>
+        <router-view v-if="$store.state.user" />
       </v-container>
     </v-main>
     <!-- metaにbottomが設定されているviewだけボトムバーを表示 -->
-    <select-color v-if="this.$route.meta.bottom" />
+    <select-color v-if="this.$route.meta.bottom && $store.state.user" />
   </v-app>
 </template>
 
@@ -47,7 +47,7 @@ export default {
 
   components: {
     Authentication,
-    SelectColor
+    SelectColor,
   },
   data() {
     return {
@@ -55,20 +55,24 @@ export default {
       items: [
         { title: "Home", icon: "mdi-home", link: { name: "Home" } },
         { title: "About", icon: "mdi-information", link: { name: "About" } },
-        { title: "Analysis", icon: "mdi-google-analytics", link: {name: "Analysis"} }
-      ]
+        {
+          title: "Analysis",
+          icon: "mdi-google-analytics",
+          link: { name: "Analysis" },
+        },
+      ],
     };
   },
   created() {
     // 認証状態の判別
-    firebase.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged((user) => {
       this.setCurrentUser(user);
     });
   },
   methods: {
     // スプレット構文 or 分割代入 :挙動をあまり詳しく把握できていない(現状は一つなので、展開する必要もない・・)
-    ...mapActions(["setCurrentUser"])
-  }
+    ...mapActions(["setCurrentUser"]),
+  },
 };
 </script>
 
