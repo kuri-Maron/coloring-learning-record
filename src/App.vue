@@ -26,7 +26,8 @@
 
     <v-main>
       <!-- コンテナーを横に広げる -->
-      <v-container fluid>
+      <!-- <v-container fluid> -->
+      <v-container>
         <router-view v-if="$store.state.user" />
       </v-container>
     </v-main>
@@ -54,12 +55,13 @@ export default {
       drawer: false,
       items: [
         { title: "Home", icon: "mdi-home", link: { name: "Home" } },
-        { title: "About", icon: "mdi-information", link: { name: "About" } },
+        { title: "タスクの編集", icon: "mdi-pencil", link: { name: "Task" } },
         {
           title: "Analysis",
           icon: "mdi-google-analytics",
           link: { name: "Analysis" },
         },
+        { title: "About", icon: "mdi-information", link: { name: "About" } },
       ],
     };
   },
