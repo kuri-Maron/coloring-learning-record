@@ -79,18 +79,26 @@
     </v-list>
 
     <h2 class="mt-4">新規タスクの追加</h2>
-    <v-row align="center">
-      <!-- TODO: バリデーションを実装する -->
-      <v-text-field
-        class="ml-3"
-        label="新規タスク"
-        v-model="newTask"
-      ></v-text-field>
-      <v-btn color="primary" outlined small @click="registerTask()"
-        >タスク登録</v-btn
-      >
-    </v-row>
-    <p>{{ newTask }}</p>
+    <v-form v-model="isValidNewTask" ref="formRegisterTask">
+      <v-row align="center" class="my-3">
+        <!-- TODO: バリデーションを実装する -->
+        <v-text-field
+          label="新規タスク名"
+          v-model="newTaskTextInput"
+          :rules="[rules.required, rules.counter]"
+          counter="15"
+          class="ml-3"
+        ></v-text-field>
+        <v-btn
+          :disabled="!isValidNewTask"
+          color="primary"
+          outlined
+          small
+          @click="registerTask()"
+          >タスク登録</v-btn
+        >
+      </v-row>
+    </v-form>
     <h2 class="mt-4">他タスクの一覧</h2>
     <v-list>
       <v-list-item
@@ -105,12 +113,6 @@
 
         <v-list-item-action>
           <div>
-            <!-- <v-btn
-              text
-              @click="renameTask(notSelectingTask, notSelectingTaskIndex)"
-            >
-              名前変更
-            </v-btn> -->
             <v-dialog
               v-model="renameDialog"
               max-width="300px"
@@ -131,31 +133,47 @@
                 </v-btn>
               </template>
               <v-card>
-                <v-card-title>タスクの新しい名前</v-card-title>
-                <v-divider></v-divider>
-                <!-- <v-card-text style="height: 300px;"> -->
-                <v-card-text>
-                  <v-text-field
-                    label="タスク名"
-                    v-model="renameTaskTextInput"
-                  ></v-text-field>
-                </v-card-text>
-                <v-divider></v-divider>
-                <v-card-actions>
-                  <v-btn color="primary" text @click="renameDialog = false">
-                    キャンセル
-                  </v-btn>
-                  <v-btn
-                    color="primary"
-                    text
-                    @click="
-                      renameText();
-                      renameDialog = false;
-                    "
-                  >
-                    決定
-                  </v-btn>
-                </v-card-actions>
+                <!-- <v-form
+                  v-model="isValidRenameTask"
+                  :ref="'formRenameTask' + notSelectingTaskIndex"
+                > -->
+                <v-form v-model="isValidRenameTask" ref="formRenameTask">
+                  <v-card-title>タスクの新しい名前</v-card-title>
+                  <v-divider></v-divider>
+                  <!-- <v-card-text style="height: 300px;"> -->
+                  <v-card-text>
+                    <v-text-field
+                      label="タスク名"
+                      v-model="renameTaskTextInput"
+                      :rules="[rules.required, rules.counter]"
+                      counter="15"
+                    ></v-text-field>
+                  </v-card-text>
+                  <v-divider></v-divider>
+                  <v-card-actions>
+                    <v-btn
+                      color="primary"
+                      text
+                      @click="
+                        testMethod();
+                        renameDialog = false;
+                      "
+                    >
+                      キャンセル
+                    </v-btn>
+                    <v-btn
+                      :disabled="!isValidRenameTask"
+                      color="primary"
+                      text
+                      @click="
+                        renameText();
+                        renameDialog = false;
+                      "
+                    >
+                      決定
+                    </v-btn>
+                  </v-card-actions>
+                </v-form>
               </v-card>
             </v-dialog>
             <v-btn
@@ -181,8 +199,15 @@ export default {
     return {
       selectingTasks: [],
       notSelectingTasks: [],
-      newTask: "",
+      newTaskTextInput: "",
       renameTaskTextInput: "",
+      isValidNewTask: false,
+      isValidRenameTask: false,
+      rules: {
+        required: (value) => !!value || "必須入力です。",
+        counter: (value) =>
+          (value && value.length <= 15) || "15文字以内で入力してください。",
+      },
       replaceTaskIndex: null,
       swapCurrentTask: {},
       renameTask: {},
@@ -249,23 +274,27 @@ export default {
         });
     },
     async registerTask() {
-      await this.db
-        .collection(`users/${this.$store.getters.uid}/taskList`)
-        .add({
-          taskText: this.newTask,
-          count: 0,
-          selecting: false,
-        })
-        .then((doc) => {
-          console.log(doc);
-          this.notSelectingTasks.push({
-            taskId: doc.id,
-            taskText: this.newTask,
+      //   console.log(this.$refs.formRegisterTask);
+      if (this.isValidNewTask) {
+        await this.db
+          .collection(`users/${this.$store.getters.uid}/taskList`)
+          .add({
+            taskText: this.newTaskTextInput,
+            count: 0,
+            selecting: false,
+          })
+          .then((doc) => {
+            console.log(doc);
+            this.notSelectingTasks.push({
+              taskId: doc.id,
+              taskText: this.newTaskTextInput,
+            });
+            this.$refs.formRegisterTask.reset();
+          })
+          .catch((err) => {
+            console.log(err);
           });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      }
     },
     // TODO: ロジックに改善の余地あり
     async swapTasks() {
@@ -323,8 +352,9 @@ export default {
       this.renameTask = { ...task, index };
       console.log(this.renameTask);
     },
-    renameText() {
-      this.db
+    async renameText() {
+      console.log(this.$refs.formRenameTask);
+      await this.db
         .collection(`users/${this.$store.getters.uid}/taskList`)
         .doc(this.renameTask.taskId)
         .update({
@@ -336,6 +366,13 @@ export default {
             "taskText",
             this.renameTaskTextInput
           );
+          // ロジックに改良の余地あり
+          this.$refs["formRenameTask"][
+            this.$refs["formRenameTask"].length - 1
+          ].reset();
+          // this.$refs.formRenameTask[this.renameTask.index].reset();
+          //   this.$refs.formRenameTask[0].reset();
+          //   this.$refs.formRegisterTask.reset();
         })
         .catch((err) => {
           console.log(err);
@@ -353,12 +390,14 @@ export default {
           console.log(err);
         });
     },
-    // testMethod(arg1, arg2) {
-    //   return {
-    //     arg1,
-    //     arg2,
-    //   };
-    // },
+    testMethod() {
+      console.log(this.$refs);
+      console.log(this.renameTask.index);
+      this.$refs["formRenameTask"][
+        this.$refs["formRenameTask"].length - 1
+      ].reset();
+      // this.$refs["formRenameTask" + this.renameTask.index][0].reset();
+    },
   },
 };
 </script>
