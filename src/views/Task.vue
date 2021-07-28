@@ -2,7 +2,7 @@
   <div>
     <h1 class="my-8">タスク編集</h1>
 
-    <h2 class="mt-4">割当済のタスク</h2>
+    <h2 class="mt-4">カラー割当中のタスク</h2>
     <p v-if="disabledSwapTask" class="blue--text text--lighten-4">
       ※メイン画面に記録中のカラーブロックがない場合のみ、他タスクを割当てることができます。
     </p>
@@ -81,7 +81,6 @@
     <h2 class="mt-4">新規タスクの追加</h2>
     <v-form v-model="isValidNewTask" ref="formRegisterTask">
       <v-row align="center" class="my-3">
-        <!-- TODO: バリデーションを実装する -->
         <v-text-field
           label="新規タスク名"
           v-model="newTaskTextInput"
@@ -133,14 +132,9 @@
                 </v-btn>
               </template>
               <v-card>
-                <!-- <v-form
-                  v-model="isValidRenameTask"
-                  :ref="'formRenameTask' + notSelectingTaskIndex"
-                > -->
                 <v-form v-model="isValidRenameTask" ref="formRenameTask">
                   <v-card-title>タスクの新しい名前</v-card-title>
                   <v-divider></v-divider>
-                  <!-- <v-card-text style="height: 300px;"> -->
                   <v-card-text>
                     <v-text-field
                       label="タスク名"
@@ -155,7 +149,7 @@
                       color="primary"
                       text
                       @click="
-                        testMethod();
+                        cancelRename();
                         renameDialog = false;
                       "
                     >
@@ -197,23 +191,23 @@ import getColorCode from "@/common/get-color-code";
 export default {
   data() {
     return {
-      selectingTasks: [],
-      notSelectingTasks: [],
-      newTaskTextInput: "",
-      renameTaskTextInput: "",
-      isValidNewTask: false,
-      isValidRenameTask: false,
+      selectingTasks: [], //カラー割当中のタスク一覧
+      notSelectingTasks: [], //他タスクの一覧
+      newTaskTextInput: "", //新規タスク用の入力ボックス
+      renameTaskTextInput: "", //名前変更用の入力ボックス
+      isValidNewTask: false, //新規タスクのバリデーションフラグ
+      isValidRenameTask: false, //名前変更のバリデーションフラグ
       rules: {
         required: (value) => !!value || "必須入力です。",
         counter: (value) =>
           (value && value.length <= 15) || "15文字以内で入力してください。",
-      },
-      replaceTaskIndex: null,
-      swapCurrentTask: {},
-      renameTask: {},
+      }, //入力ボックスのバリデーション
+      replaceTaskIndex: null, //対象カラーに新しく割当てるタスクのインデックス
+      swapCurrentTask: {}, //対象カラーに現在割当中のタスク
+      renameTask: {}, //名前変更をするタスク
       swapTaskDialog: false,
       renameDialog: false,
-      disabledSwapTask: false,
+      disabledSwapTask: false, //カラー割当タスクの変更ボタンの非活性制御
       db: null,
     };
   },
@@ -224,6 +218,7 @@ export default {
     await this.fetchNotSelectingTasks();
   },
   methods: {
+    // 記録中のタスクの有無をチェックし、カラータスクの変更ボタンの非活性を制御
     async checkCellsCollectionSize() {
       await this.db
         .collection(`users/${this.$store.getters.uid}/cells`)
@@ -234,6 +229,8 @@ export default {
           }
         });
     },
+    // TODO: fetch処理は一回にまとめれる。もしくは、もっと上位の段階でまとめて取得し、vuex管理
+    // カラー割当中タスクの一覧をDBから取得
     async fetchSelectingTasks() {
       await this.db
         .collection(`users/${this.$store.getters.uid}/taskList`)
@@ -254,6 +251,7 @@ export default {
           console.log(err);
         });
     },
+    //他タスクの一覧をDBから取得
     async fetchNotSelectingTasks() {
       await this.db
         .collection(`users/${this.$store.getters.uid}/taskList`)
@@ -269,12 +267,11 @@ export default {
           });
         })
         .catch((err) => {
-          console.log("エラーだと");
           console.log(err);
         });
     },
+    // 新規タスクの登録
     async registerTask() {
-      //   console.log(this.$refs.formRegisterTask);
       if (this.isValidNewTask) {
         await this.db
           .collection(`users/${this.$store.getters.uid}/taskList`)
@@ -297,6 +294,7 @@ export default {
       }
     },
     // TODO: ロジックに改善の余地あり
+    //カラー割当中タスクを選択した他タスクに変更する
     async swapTasks() {
       const replaceTask = this.notSelectingTasks[this.replaceTaskIndex];
 
@@ -342,16 +340,17 @@ export default {
       this.replaceTaskIndex = null;
       this.swapCurrentTask = {};
     },
+    // 割当タスク変更ボタン押下時に選択したタスクをstateにセット
     setSwapCurrentTask(task, index) {
       this.swapCurrentTask = { ...task, index };
       console.log(this.swapCurrentTask);
-      //   this.swapCurrentTask = task;
-      //   this.$set(this.swapCurrentTask, "index", index);
     },
+    // 名前変更ボタン押下時に選択したタスクをstateにセット
     setRenameTask(task, index) {
       this.renameTask = { ...task, index };
       console.log(this.renameTask);
     },
+    // 名前変更するダイアログで決定ボタン押下に、入力した名前で更新
     async renameText() {
       console.log(this.$refs.formRenameTask);
       await this.db
@@ -366,18 +365,16 @@ export default {
             "taskText",
             this.renameTaskTextInput
           );
-          // ロジックに改良の余地あり
+          // ロジックに改良の余地あり（v-slot,v-for,refあたりの関係を整理すること）
           this.$refs["formRenameTask"][
             this.$refs["formRenameTask"].length - 1
           ].reset();
-          // this.$refs.formRenameTask[this.renameTask.index].reset();
-          //   this.$refs.formRenameTask[0].reset();
-          //   this.$refs.formRegisterTask.reset();
         })
         .catch((err) => {
           console.log(err);
         });
     },
+    // タスクの削除
     deleteTask(task, index) {
       this.db
         .collection(`users/${this.$store.getters.uid}/taskList`)
@@ -390,14 +387,20 @@ export default {
           console.log(err);
         });
     },
-    testMethod() {
-      console.log(this.$refs);
-      console.log(this.renameTask.index);
+    // 名前変更のダイアログでキャンセル押下時に、フォームをリセット
+    cancelRename() {
       this.$refs["formRenameTask"][
         this.$refs["formRenameTask"].length - 1
       ].reset();
-      // this.$refs["formRenameTask" + this.renameTask.index][0].reset();
     },
+    // testMethod() {
+    //   console.log(this.$refs);
+    //   console.log(this.renameTask.index);
+    //   this.$refs["formRenameTask"][
+    //     this.$refs["formRenameTask"].length - 1
+    //   ].reset();
+    //   // this.$refs["formRenameTask" + this.renameTask.index][0].reset();
+    // },
   },
 };
 </script>
