@@ -217,6 +217,7 @@ export default {
     await this.fetchSelectingTasks();
     await this.fetchNotSelectingTasks();
   },
+  // TODO: DBが関連するメソッドはすべて、ログイン有無の判断ロジックを挿入するべきか検討する
   methods: {
     // 記録中のタスクの有無をチェックし、カラータスクの変更ボタンの非活性を制御
     async checkCellsCollectionSize() {

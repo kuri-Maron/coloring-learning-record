@@ -5,7 +5,8 @@ const getColorCode = (colorText) => {
       colorCode = "#FF5252";
       break;
     case "blue":
-      colorCode = "#3F51B5";
+      // colorCode = "#3F51B5";
+      colorCode = "#3D5AFE";
       break;
     case "green":
       colorCode = "#4CAF50";

@@ -8,22 +8,22 @@
       <v-dialog v-model="dialog" max-width="290">
         <template v-slot:activator="{ on }">
           <!-- 現在のcell情報をDBに格納して、リセットボタン -->
-          <v-btn absolute right fab color="pink" type="button" v-on="on"
-            ><v-icon>mdi-plus</v-icon></v-btn
+          <v-btn absolute right color="pink" type="button" v-on="on">
+            <v-icon>mdi-plus</v-icon>新規ページ</v-btn
           >
         </template>
         <v-card>
-          <v-card-title class="headline">合計時間に加算しますか？</v-card-title>
+          <v-card-title class="headline"
+            >記録を保存して、新しいページにしますか？</v-card-title
+          >
           <v-card-text
-            >このページ内の合計時間を全期間データに集計して、ページをリセットします。</v-card-text
+            >このページ内の合計時間を分析用データとして集計します。分析メニューから実績データを確認できます。</v-card-text
           >
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="green darken-1" text @click="dialog = false"
-              >No</v-btn
-            >
+            <v-btn color="primary" text @click="dialog = false">No</v-btn>
             <v-btn
-              color="green darken-1"
+              color="primary"
               text
               @click="
                 mergeCells();
@@ -40,9 +40,16 @@
     <div class="d-flex flex-wrap justify-center mainArea">
       <div
         v-for="(cell, index) in cellLists"
-        class="flexItem"
-        :style="{ 'background-color': cell.colorCode }"
-        :key="index"
+        :class="[
+          'flexItem',
+          cell.id ? 'colorItem' : '',
+          index === nextSettableCell ? 'nextSettableCell' : '',
+        ]"
+        :style="{
+          ...styleActiveColor,
+          'background-color': cell.colorCode,
+        }"
+        :key="cell.id"
         @click="selectCell(index)"
       ></div>
     </div>
@@ -56,7 +63,7 @@ export default {
   name: "Coloring",
   data() {
     return {
-      // 固定長の配列を定義
+      // 固定長の配列を定義。記録するセル数だけ定義
       cellLists: Array(32).fill({}),
       dialog: false,
       db: null,
@@ -76,10 +83,21 @@ export default {
         return "taskId" in cell;
       }).length;
     },
+    // 次にカラーをセットできるセルのインデックス
+    nextSettableCell() {
+      return this.cellLists.findIndex((value) => {
+        return !("id" in value);
+      });
+    },
+    // CSS変数で動的に制御するための変数
+    styleActiveColor() {
+      return {
+        "--color-code": this.activeCellObj.colorCode,
+      };
+    },
   },
   async created() {
     this.db = firebase.firestore();
-    // TODO: API通信が終わる前に一度レンダリングされる原因について
     // firestoreからデータ取得
     await this.featchCells();
   },
@@ -95,6 +113,7 @@ export default {
     );
   },
   methods: {
+    // セルのクリック時の動作。カラー登録か削除。
     selectCell(index) {
       // ログイン時のみ実行可能
       if (this.$store.state.user) {
@@ -134,6 +153,7 @@ export default {
         alert("ログインしてください！");
       }
     },
+    // 分析用データとして保存し、新しいページにする。
     mergeCells() {
       let batch = this.db.batch();
       this.cellLists.forEach((cell) => {
@@ -162,28 +182,8 @@ export default {
           );
         })
         .catch((err) => console.log(err));
-
-      // forEachはasync非対応みたい
-      // for (let [index, cell] of this.cellLists.entries()) {
-      //   // id属性が含まれているかチェック
-      //   if ("id" in cell) {
-      //     console.log("マージ処理実行開始");
-      //     // 一個ずつ更新→ローカル反映しているが、もっといいロジックがあるかも
-      //     await firebase
-      //       .firestore()
-      //       .collection(`users/${this.$store.getters.uid}/records`)
-      //       .doc(cell.id)
-      //       // TODO: notActiveObjをthis.$setするほうがよくね
-      //       .update({
-      //         isActive: false,
-      //       })
-      //       .then(() => {
-      //         // もっと良い実装があるはず。
-      //         this.$set(this.cellLists, index, {});
-      //       });
-      //   }
-      // }
     },
+    // ＤＢからセル情報を取得
     async featchCells() {
       if (this.$store.state.user) {
         await this.db
@@ -191,7 +191,6 @@ export default {
           .orderBy("timeStamp")
           .get()
           .then((snapshot) => {
-            // console.log(`取得件数は、${snapshot.size}です。`);
             snapshot.docs.forEach((doc, index) => {
               const docData = doc.data();
               this.$set(this.cellLists, index, {
@@ -201,13 +200,10 @@ export default {
                 ],
                 id: doc.id,
               });
-              // console.log("firestoreの値で更新", this.cellLists[index]);
             });
-            console.log("データセット完了");
           });
-        console.log("API取得完了？");
       } else {
-        console.log("未ログインのためデータ取得する不可");
+        alert("ログインしてください。");
       }
     },
   },
@@ -226,7 +222,6 @@ export default {
 <style scoped>
 .mainArea {
   height: 70vh;
-  /* background-color: rgb(195, 233, 29); */
 }
 .flexItem {
   /* もっと良いサイズ指定方法があるはず */
@@ -234,14 +229,17 @@ export default {
   width: 23%;
   background-color: #424242;
   border: solid 1px;
-  /* border-color: #607d8b; */
   border-color: #cfd8dc;
   opacity: 0.7;
 }
-/* 現状未使用： アドオンでアクティブセルのレイアウト作り込みするために利用 */
-/* .cellCheck {
-  background-color: #98fb98;
-} */
+.colorItem:hover {
+  opacity: 0.5;
+  cursor: pointer;
+}
+.nextSettableCell:hover {
+  border-color: var(--color-code);
+  border-width: 2px;
+}
 
 /* 生cssでflexを実装する場合 */
 /* div.flexBox {
