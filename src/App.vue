@@ -1,17 +1,7 @@
 <template>
   <v-app>
-    <v-app-bar app>
-      <div class="d-flex align-center">
-        <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-        <v-toolbar-title>学習記録</v-toolbar-title>
-      </div>
-      <v-spacer></v-spacer>
-      <!-- 認証機能コンポーネント -->
-      <Authentication />
-    </v-app-bar>
-
     <!-- サイドナビバー TODO: 単一コンポーネント化@drawer扱い-->
-    <v-navigation-drawer v-model="drawer" absolute temporary>
+    <v-navigation-drawer v-model="drawer" app temporary>
       <v-list>
         <v-list-item v-for="item in items" :key="item.title" :to="item.link">
           <v-list-item-icon>
@@ -23,6 +13,16 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
+
+    <v-app-bar app>
+      <div class="d-flex align-center">
+        <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+        <v-toolbar-title>学習記録</v-toolbar-title>
+      </div>
+      <v-spacer></v-spacer>
+      <!-- 認証機能コンポーネント -->
+      <Authentication />
+    </v-app-bar>
 
     <v-main>
       <!-- コンテナーを横に広げる -->
