@@ -2,7 +2,7 @@
   <v-app>
     <!-- サイドナビバー TODO: 単一コンポーネント化@drawer扱い-->
     <v-navigation-drawer v-model="drawer" app temporary>
-      <v-list>
+      <v-list nav>
         <v-list-item v-for="item in items" :key="item.title" :to="item.link">
           <v-list-item-icon>
             <v-icon>{{ item.icon }}</v-icon>
@@ -54,7 +54,10 @@ export default {
     return {
       drawer: false,
       items: [
-        { title: "Home", icon: "mdi-home", link: { name: "Home" } },
+        // ルート要素のみ、nameプロパティでバインドするとバグるので、pathプロパティを使用
+        // { title: "Home", icon: "mdi-home", link: { name: "Home" } },
+        // { title: "Home", icon: "mdi-home", link: "/" },
+        { title: "Home", icon: "mdi-home", link: { path: "/" } },
         { title: "タスクの編集", icon: "mdi-pencil", link: { name: "Task" } },
         {
           title: "Analysis",

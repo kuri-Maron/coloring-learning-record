@@ -11,6 +11,7 @@ const routes = [
     // meta 属性の正式な利用方法を把握していない
     meta: { bottom: true },
     component: Home,
+    // component: () => import("@/views/Home.vue"),
   },
   {
     path: "/task",
