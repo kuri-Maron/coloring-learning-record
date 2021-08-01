@@ -5,58 +5,48 @@
         <v-row justify="center">
           <h1>これまでの記録</h1>
         </v-row>
-        <v-row
-          align="center"
-          align-content="center"
-          justify="space-around"
-          style="height: 90%;"
-        >
+        <v-row align="center" justify="space-around" style="height: 90%;">
           <v-col
             cols="10"
             md="5"
             class="my-sm-5"
             :style="`height: ${viewportHeight};`"
           >
-            <v-card class="card d-flex align-center justify-center pb-5">
-              <div class="d-flex flex-column justify-center">
-                <v-window v-model="onboarding">
-                  <v-window-item
-                    v-for="value in countCellDatas"
-                    :key="value.id"
-                  >
-                    <v-card-text class="text-center text-h6">
-                      {{ value.taskText }}
-                    </v-card-text>
-                    <v-card-text class="text-center text-h4">{{
-                      value.count | timeNotation
-                    }}</v-card-text>
-                  </v-window-item>
-                </v-window>
+            <v-card class="card d-flex flex-column align-center justify-center">
+              <v-window v-model="onboarding">
+                <v-window-item v-for="value in countCellDatas" :key="value.id">
+                  <v-card-text class="text-center text-h6">
+                    {{ value.taskText }}
+                  </v-card-text>
+                  <v-card-text class="text-center text-h4">{{
+                    value.count | timeNotation
+                  }}</v-card-text>
+                </v-window-item>
+              </v-window>
 
-                <v-card-actions class="justify-space-between">
-                  <v-btn text @click="prev">
-                    <v-icon>mdi-chevron-left</v-icon>
-                  </v-btn>
-                  <v-item-group
-                    v-model="onboarding"
-                    class="text-center"
-                    mandatory
+              <v-card-actions class="justify-space-between">
+                <v-btn text @click="prev">
+                  <v-icon>mdi-chevron-left</v-icon>
+                </v-btn>
+                <v-item-group
+                  v-model="onboarding"
+                  class="text-center"
+                  mandatory
+                >
+                  <v-item
+                    v-for="value in countCellDatas"
+                    :key="`btn-${value.id}`"
+                    v-slot:default="{ active, toggle }"
                   >
-                    <v-item
-                      v-for="(value, index) in countCellDatas"
-                      :key="`btn-${index}`"
-                      v-slot:default="{ active, toggle }"
-                    >
-                      <v-btn :input-value="active" icon @click="toggle">
-                        <v-icon>mdi-record</v-icon>
-                      </v-btn>
-                    </v-item>
-                  </v-item-group>
-                  <v-btn text @click="next">
-                    <v-icon>mdi-chevron-right</v-icon>
-                  </v-btn>
-                </v-card-actions>
-              </div>
+                    <v-btn :input-value="active" icon @click="toggle">
+                      <v-icon>mdi-record</v-icon>
+                    </v-btn>
+                  </v-item>
+                </v-item-group>
+                <v-btn text @click="next">
+                  <v-icon>mdi-chevron-right</v-icon>
+                </v-btn>
+              </v-card-actions>
             </v-card>
           </v-col>
 
@@ -68,7 +58,15 @@
             :style="`height: ${viewportHeight};`"
           >
             <v-card class="card pa-2">
-              <graph-view :countCellDatas="propsCountCellDatas" />
+              <graph-view
+                v-if="countCellDatas[0].count !== 0"
+                :countCellDatas="propsCountCellDatas"
+              />
+              <v-card-text>
+                <p v-if="countCellDatas[0].count === 0">
+                  選択中のタスクはまだ記録されたデータが存在しないので、円グラフは表示されません。
+                </p>
+              </v-card-text>
             </v-card>
           </v-col>
         </v-row>
