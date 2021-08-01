@@ -102,13 +102,13 @@ export default {
           taskText: "総合計時間",
         },
       ],
+      db: null,
     };
   },
   async created() {
     if (this.$store.state.user) {
-      // TODO: firestoreをDBとして定義する
-      const querySnapshot = await firebase
-        .firestore()
+      this.db = firebase.firestore();
+      const querySnapshot = await this.db
         .collection(`users/${this.$store.getters.uid}/taskList`)
         .where("selecting", "==", true)
         .orderBy("count", "desc")
