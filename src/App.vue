@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app class="app">
     <!-- サイドナビバー TODO: 単一コンポーネント化@drawer扱い-->
     <v-navigation-drawer v-model="drawer" app temporary>
       <v-list nav>
@@ -60,7 +60,7 @@ export default {
         { title: "Home", icon: "mdi-home", link: { path: "/" } },
         { title: "タスクの編集", icon: "mdi-pencil", link: { name: "Task" } },
         {
-          title: "Analysis",
+          title: "これまでの記録",
           icon: "mdi-google-analytics",
           link: { name: "Analysis" },
         },
@@ -82,7 +82,10 @@ export default {
 </script>
 
 <style scoped>
-.linkFont {
-  color: white;
+.app {
+  min-width: 300px;
 }
+/* .linkFont {
+  color: white;
+} */
 </style>

@@ -1,101 +1,92 @@
 <template>
-  <v-sheet color="pink" max-height="90vh" height="89vh" min-height="600px">
-    <!-- <v-sheet color="pink" max-height="90vh" height="89vh"> -->
-    <!-- 下記のカードはレイアウト確認用のノードなので、消して良い -->
-    <v-card class="ma-auto text-center" max-width="50vmin">{{
-      imageHeight
-    }}</v-card>
-
-    <v-row align="center" justify="space-around" style="height: 95%;">
-      <!-- <v-col cols="10" md="5" :style="`height: ${viewportHeight};`">
-        <v-card class="card pa-2">
-          <v-card-title>総合計時間</v-card-title>
-          <div class="card-content d-flex align-center pb-10">
-            <v-card-text class="card-main-text text-center"
-              >HH : MM</v-card-text
-            >
-          </div>
-        </v-card>
-      </v-col>-->
-
-      <v-col cols="10" md="5" :style="`height: ${viewportHeight};`">
-        <!-- <v-card class="card pa-2"> -->
-        <v-card class="card d-flex align-center justify-center pb-5">
-          <!-- コピペwindow -->
-          <div class="card-content d-flex flex-column justify-center">
-            <v-window v-model="onboarding">
-              <v-window-item
-                v-for="(value, index) in countCellDatas"
-                :key="`card-${index}`"
-              >
-                <v-row align="center" justify="center" tag="v-card-text">
-                  <v-card-text class="text-center">
-                    {{ value.taskText }}
-                  </v-card-text>
-                </v-row>
-                <!-- tag="v-card-text" これ何？ -->
-                <v-row align="center" justify="center" tag="v-card-text">
-                  <v-card-text
-                    style="font-size: 10vmin;"
-                    class="text-center white--text"
-                    >{{ value.count | timeNotation }}</v-card-text
+  <div style="height: 100%;">
+    <v-sheet color="grey darken-2" min-height="600px" height="85vh">
+      <v-container style="min-height: inherit; height: 100%;">
+        <v-row justify="center">
+          <h1>これまでの記録</h1>
+        </v-row>
+        <v-row
+          align="center"
+          align-content="center"
+          justify="space-around"
+          style="height: 90%;"
+        >
+          <v-col
+            cols="10"
+            md="5"
+            class="my-sm-5"
+            :style="`height: ${viewportHeight};`"
+          >
+            <v-card class="card d-flex align-center justify-center pb-5">
+              <div class="d-flex flex-column justify-center">
+                <v-window v-model="onboarding">
+                  <v-window-item
+                    v-for="value in countCellDatas"
+                    :key="value.id"
                   >
-                </v-row>
-              </v-window-item>
-            </v-window>
+                    <!-- TODO: 新しいvuetifyのサンプルコードを参考にリファクタリングする -->
+                    <v-row align="center" justify="center" tag="v-card-text">
+                      <v-card-text class="text-center text-h6">
+                        {{ value.taskText }}
+                      </v-card-text>
+                    </v-row>
+                    <!-- tag="v-card-text" これ何？ -->
+                    <v-row align="center" justify="center" tag="v-card-text">
+                      <v-card-text class="text-center white--text text-h4">{{
+                        value.count | timeNotation
+                      }}</v-card-text>
+                    </v-row>
+                  </v-window-item>
+                </v-window>
 
-            <v-card-actions class="justify-space-between">
-              <v-btn text @click="prev">
-                <v-icon>mdi-chevron-left</v-icon>
-              </v-btn>
-              <v-item-group v-model="onboarding" class="text-center" mandatory>
-                <v-item
-                  v-for="(value, index) in countCellDatas"
-                  :key="`btn-${index}`"
-                  v-slot:default="{ active, toggle }"
-                >
-                  <v-btn :input-value="active" icon @click="toggle">
-                    <v-icon>mdi-record</v-icon>
+                <v-card-actions class="justify-space-between">
+                  <v-btn text @click="prev">
+                    <v-icon>mdi-chevron-left</v-icon>
                   </v-btn>
-                </v-item>
-              </v-item-group>
-              <v-btn text @click="next">
-                <v-icon>mdi-chevron-right</v-icon>
-              </v-btn>
-            </v-card-actions>
-          </div>
-        </v-card>
-      </v-col>
+                  <v-item-group
+                    v-model="onboarding"
+                    class="text-center"
+                    mandatory
+                  >
+                    <v-item
+                      v-for="(value, index) in countCellDatas"
+                      :key="`btn-${index}`"
+                      v-slot:default="{ active, toggle }"
+                    >
+                      <v-btn :input-value="active" icon @click="toggle">
+                        <v-icon>mdi-record</v-icon>
+                      </v-btn>
+                    </v-item>
+                  </v-item-group>
+                  <v-btn text @click="next">
+                    <v-icon>mdi-chevron-right</v-icon>
+                  </v-btn>
+                </v-card-actions>
+              </div>
+            </v-card>
+          </v-col>
 
-      <!-- 円グラフ表示部 -->
-      <v-col cols="10" md="5" :style="`height: ${viewportHeight};`">
-        <v-card class="card pa-2">
-          <!-- <graph-view :countCellDatas="propsCountCellDatas" class="pie-chart"/> -->
-          <graph-view :countCellDatas="propsCountCellDatas" />
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-sheet>
+          <!-- 円グラフ表示部 -->
+          <v-col
+            cols="10"
+            md="5"
+            class="my-sm-5"
+            :style="`height: ${viewportHeight};`"
+          >
+            <v-card class="card pa-2">
+              <graph-view :countCellDatas="propsCountCellDatas" />
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-sheet>
+  </div>
 </template>
 
 <style scoped>
-.card-main-text {
-  font-size: 10vmin;
-}
 .card {
   height: 100%;
-  min-height: 250px;
-}
-.card-content {
-  height: 70%;
-  min-height: 90px;
-  width: 100%;
-  /* max-width: 100%; */
-}
-.pie-chart {
-  width: 30%;
-  /* height: 50%; */
-  background-color: #fff;
+  /* min-height: 350px; */
 }
 </style>
 
@@ -111,10 +102,10 @@ export default {
   },
   data() {
     return {
-      length: 3,
       onboarding: 0,
       countCellDatas: [
         {
+          id: "sumHour",
           count: 0,
           taskText: "総合計時間",
         },
@@ -122,64 +113,43 @@ export default {
     };
   },
   async created() {
-    //   console.log("wwww:", this.$store.state.user);
     if (this.$store.state.user) {
+      // TODO: firestoreをDBとして定義する
       const querySnapshot = await firebase
         .firestore()
         .collection(`users/${this.$store.getters.uid}/taskList`)
         .where("selecting", "==", true)
+        .orderBy("count", "desc")
         .get();
-      // console.log(querySnapshot);
       querySnapshot.forEach((doc) => {
         const docData = doc.data();
         this.countCellDatas.push({
+          id: doc.id,
           taskText: docData.taskText,
           count: docData.count,
           colorCode: getColorCode(docData.color),
         });
         this.countCellDatas[0].count += docData.count;
       });
-      console.log(this.countCellDatas);
-      // this.countCellDatas = { ...querySnapshot.data()};
-      // console.log(this.countCellDatas);
     }
   },
-  mounted() {
-    console.log(this.$vuetify.breakpoint);
-  },
-
   computed: {
     propsCountCellDatas() {
       return this.countCellDatas.map((countCellData) => countCellData).slice(1);
     },
     viewportHeight() {
-      let height = "";
+      let height;
       switch (this.$vuetify.breakpoint.name) {
         case "xs":
-          height = "40%";
+          height = "45%";
           break;
         case "sm":
-          height = "40%";
+          height = "45%";
           break;
         default:
           height = "80%";
       }
       return height;
-    },
-    imageHeight() {
-      switch (this.$vuetify.breakpoint.name) {
-        case "xs":
-          return "xs)220px";
-        case "sm":
-          return "sm)400px";
-        case "md":
-          return "md)500px";
-        case "lg":
-          return "lg)600px";
-        case "xl":
-          return "xl)800px";
-      }
-      return 0;
     },
   },
   methods: {
