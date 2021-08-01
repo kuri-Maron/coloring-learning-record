@@ -24,18 +24,12 @@
                     v-for="value in countCellDatas"
                     :key="value.id"
                   >
-                    <!-- TODO: 新しいvuetifyのサンプルコードを参考にリファクタリングする -->
-                    <v-row align="center" justify="center" tag="v-card-text">
-                      <v-card-text class="text-center text-h6">
-                        {{ value.taskText }}
-                      </v-card-text>
-                    </v-row>
-                    <!-- tag="v-card-text" これ何？ -->
-                    <v-row align="center" justify="center" tag="v-card-text">
-                      <v-card-text class="text-center white--text text-h4">{{
-                        value.count | timeNotation
-                      }}</v-card-text>
-                    </v-row>
+                    <v-card-text class="text-center text-h6">
+                      {{ value.taskText }}
+                    </v-card-text>
+                    <v-card-text class="text-center text-h4">{{
+                      value.count | timeNotation
+                    }}</v-card-text>
                   </v-window-item>
                 </v-window>
 
