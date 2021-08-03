@@ -71,11 +71,11 @@ export default {
   created() {
     // 認証状態の判別
     firebase.auth().onAuthStateChanged((user) => {
+      console.log("user: ", user);
       this.setCurrentUser(user);
     });
   },
   methods: {
-    // スプレット構文 or 分割代入 :挙動をあまり詳しく把握できていない(現状は一つなので、展開する必要もない・・)
     ...mapActions(["setCurrentUser"]),
   },
 };

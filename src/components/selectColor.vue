@@ -48,6 +48,7 @@
 import firebase from "firebase/app";
 import "firebase/firestore";
 import getColorCode from "@/common/get-color-code";
+import MUTATION_TYPES from "@/store/mutation-types";
 export default {
   data() {
     return {
@@ -66,7 +67,7 @@ export default {
         return this.$store.state.activeColor;
       },
       set(value) {
-        this.$store.commit("setColor", value);
+        this.$store.commit(MUTATION_TYPES.SET_ACTIVE_COLOR, value);
       },
     },
   },
@@ -140,7 +141,10 @@ export default {
         }),
         {}
       );
-      this.$store.commit("setMappingTaskAndColor", mappingTaskandColor);
+      this.$store.commit(
+        MUTATION_TYPES.SET_MAPPING_TASK_AND_COLOR,
+        mappingTaskandColor
+      );
     },
   },
 };
