@@ -79,7 +79,7 @@
     </v-list>
 
     <h2 class="mt-4">新規タスクの追加</h2>
-    <v-form v-model="isValidNewTask" ref="formRegisterTask">
+    <v-form v-model="isValidNewTask" ref="formRegisterTask" @submit.prevent>
       <v-row align="center" class="my-3">
         <v-text-field
           label="新規タスク名"
@@ -87,6 +87,7 @@
           :rules="[rules.required, rules.counter]"
           counter="15"
           class="ml-3"
+          @blur="resetNewTaskTextInput"
         ></v-text-field>
         <v-btn
           :disabled="!isValidNewTask"
@@ -132,7 +133,11 @@
                 </v-btn>
               </template>
               <v-card>
-                <v-form v-model="isValidRenameTask" ref="formRenameTask">
+                <v-form
+                  v-model="isValidRenameTask"
+                  ref="formRenameTask"
+                  @submit.prevent
+                >
                   <v-card-title>タスクの新しい名前</v-card-title>
                   <v-divider></v-divider>
                   <v-card-text>
@@ -276,6 +281,9 @@ export default {
       this.$refs["formRenameTask"][
         this.$refs["formRenameTask"].length - 1
       ].reset();
+    },
+    resetNewTaskTextInput() {
+      this.$refs.formRegisterTask.reset();
     },
   },
 };
