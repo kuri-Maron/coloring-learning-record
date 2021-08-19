@@ -70,13 +70,18 @@ export default {
   },
   created() {
     // 認証状態の判別
-    firebase.auth().onAuthStateChanged((user) => {
+    firebase.auth().onAuthStateChanged(async (user) => {
       console.log("user: ", user);
       this.setCurrentUser(user);
+      // ログインした場合、ＤＢからメインデータ取得
+      if (user) {
+        await this.fetchTasks();
+        await this.fetchCellList();
+      }
     });
   },
   methods: {
-    ...mapActions(["setCurrentUser"]),
+    ...mapActions(["setCurrentUser", "fetchTasks", "fetchCellList"]),
   },
 };
 </script>

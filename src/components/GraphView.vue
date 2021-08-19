@@ -14,7 +14,7 @@ export default {
   components: {
     PieChart,
   },
-  props: ["countCellDatas"],
+  props: ["countTaskListData"],
   data() {
     return {
       chartOptions: {
@@ -31,13 +31,15 @@ export default {
       };
     },
     chartData() {
-      const countData = this.countCellDatas.map((cellData) => cellData.count);
-      const dataColor = this.countCellDatas.map(
-        (cellData) => cellData.colorCode
+      const countData = this.countTaskListData.map(
+        (taskData) => taskData.count
+      );
+      const dataColor = this.countTaskListData.map(
+        (taskData) => taskData.colorCode
       );
       let obj = {
-        labels: this.countCellDatas.map((cellData) => {
-          return cellData.taskText;
+        labels: this.countTaskListData.map((taskData) => {
+          return taskData.taskText;
         }),
         datasets: [],
       };

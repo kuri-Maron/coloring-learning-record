@@ -14,12 +14,15 @@
           >
             <v-card class="card d-flex flex-column align-center justify-center">
               <v-window v-model="onboarding">
-                <v-window-item v-for="value in countCellDatas" :key="value.id">
+                <v-window-item
+                  v-for="countTaskData in countTaskListData"
+                  :key="countTaskData.taskId"
+                >
                   <v-card-text class="text-center text-h6">
-                    {{ value.taskText }}
+                    {{ countTaskData.taskText }}
                   </v-card-text>
                   <v-card-text class="text-center text-h4">{{
-                    value.count | timeNotation
+                    countTaskData.count | timeNotation
                   }}</v-card-text>
                 </v-window-item>
               </v-window>
@@ -34,8 +37,8 @@
                   mandatory
                 >
                   <v-item
-                    v-for="value in countCellDatas"
-                    :key="`btn-${value.id}`"
+                    v-for="countTaskData in countTaskListData"
+                    :key="`btn-${countTaskData.taskId}`"
                     v-slot:default="{ active, toggle }"
                   >
                     <v-btn :input-value="active" icon @click="toggle">
@@ -59,11 +62,11 @@
           >
             <v-card class="card pa-2">
               <graph-view
-                v-if="countCellDatas[0].count !== 0"
-                :countCellDatas="propsCountCellDatas"
+                v-if="countTaskListData[0].count !== 0"
+                :countTaskListData="countTaskListData.slice(1)"
               />
               <v-card-text>
-                <p v-if="countCellDatas[0].count === 0">
+                <p v-if="countTaskListData[0].count === 0">
                   選択中のタスクはまだ記録されたデータが存在しないので、円グラフは表示されません。
                 </p>
               </v-card-text>
@@ -83,10 +86,8 @@
 </style>
 
 <script>
-import firebase from "firebase/app";
 import "firebase/firestore";
 import GraphView from "@/components/GraphView.vue";
-import getColorCode from "@/common/get-color-code";
 
 export default {
   components: {
@@ -95,39 +96,25 @@ export default {
   data() {
     return {
       onboarding: 0,
-      countCellDatas: [
-        {
-          id: "sumHour",
-          count: 0,
-          taskText: "総合計時間",
-        },
-      ],
       db: null,
     };
   },
-  async created() {
-    if (this.$store.state.user) {
-      this.db = firebase.firestore();
-      const querySnapshot = await this.db
-        .collection(`users/${this.$store.getters.uid}/taskList`)
-        .where("selecting", "==", true)
-        .orderBy("count", "desc")
-        .get();
-      querySnapshot.forEach((doc) => {
-        const docData = doc.data();
-        this.countCellDatas.push({
-          id: doc.id,
-          taskText: docData.taskText,
-          count: docData.count,
-          colorCode: getColorCode(docData.color),
-        });
-        this.countCellDatas[0].count += docData.count;
-      });
-    }
-  },
   computed: {
-    propsCountCellDatas() {
-      return this.countCellDatas.map((countCellData) => countCellData).slice(1);
+    countTaskListData() {
+      let taskList = this.$store.state.selecitngTasks.map((task) => task);
+      taskList.sort((a, b) => b.count - a.count);
+      const samCount = taskList.reduce(
+        (accumulator, currentValue) => accumulator + currentValue.count,
+        0
+      );
+      return [
+        {
+          id: "sumHour",
+          count: samCount,
+          taskText: "総合計時間",
+        },
+        ...taskList,
+      ];
     },
     viewportHeight() {
       let height;
@@ -147,14 +134,14 @@ export default {
   methods: {
     next() {
       this.onboarding =
-        this.onboarding + 1 === this.countCellDatas.length
+        this.onboarding + 1 === this.countTaskListData.length
           ? 0
           : this.onboarding + 1;
     },
     prev() {
       this.onboarding =
         this.onboarding - 1 < 0
-          ? this.countCellDatas.length - 1
+          ? this.countTaskListData.length - 1
           : this.onboarding - 1;
     },
   },

@@ -5,7 +5,7 @@
       mandatory
       grow
       background-color="#121212"
-      v-model="activeColorText"
+      v-model="activeColor"
     >
       <v-btn
         v-ripple
@@ -22,7 +22,7 @@
         <v-icon
           dense
           :color="
-            activeColorText.colorCode == colorObj.colorCode
+            activeColor.colorCode == colorObj.colorCode
               ? colorObj.colorCode
               : '#121212'
           "
@@ -34,35 +34,11 @@
 </template>
 
 <script>
-// colorList: [
-//   // {
-//   //   colorText: "green",
-//   //   colorCode: "#4CAF50",
-//   //   description: "タスク1",
-//   // },
-//   // { colorText: "blue", colorCode: "#3F51B5", description: "タスク2" },
-//   // { colorText: "yellow", colorCode: "#FFAB00", description: "タスク3" },
-//   // { colorText: "red", colorCode: "#FF5252", description: "タスク4" },
-// ],
-
-import firebase from "firebase/app";
-import "firebase/firestore";
-import getColorCode from "@/common/get-color-code";
 import MUTATION_TYPES from "@/store/mutation-types";
 export default {
-  data() {
-    return {
-      colorList: [],
-    };
-  },
-  // async mounted() {
-  async created() {
-    await this.fetchTaskButtons();
-    this.setMappingTaskAndColor();
-  },
   computed: {
     // vuexのstateに現在アクティブなカラーオブジェクト情報を設定している
-    activeColorText: {
+    activeColor: {
       get() {
         return this.$store.state.activeColor;
       },
@@ -70,81 +46,8 @@ export default {
         this.$store.commit(MUTATION_TYPES.SET_ACTIVE_COLOR, value);
       },
     },
-  },
-  methods: {
-    async fetchTaskButtons() {
-      if (this.$store.state.user) {
-        await firebase
-          .firestore()
-          .collection(`users/${this.$store.getters.uid}/taskList`)
-          .where("selecting", "==", true)
-          .orderBy("color")
-          .get()
-          .then(async (snapshot) => {
-            if (snapshot.size === 0) {
-              // コレクション内にドキュメントが存在しない場合
-              // 新規で仮タスクを登録する
-              await this.setInitialTask();
-            } else {
-              // コレクション内にドキュメントが存在する場合
-              snapshot.docs.forEach((doc) => {
-                this.colorList.push({
-                  taskId: doc.id,
-                  taskText: doc.get("taskText"),
-                  color: doc.get("color"),
-                  colorCode: getColorCode(doc.get("color")),
-                });
-              });
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      }
-    },
-
-    async setInitialTask() {
-      const colorArray = ["blue", "green", "red", "yellow"];
-      for (let i = 0; i < 4; i++) {
-        // DBとフロントの両方で保持するデータ
-        const baseObj = {
-          color: colorArray[i],
-          taskText: `task${i + 1}`,
-        };
-        await firebase
-          .firestore()
-          .collection(`users/${this.$store.getters.uid}/taskList`)
-          .add({
-            ...baseObj,
-            selecting: true,
-            count: 0,
-          })
-          .then((doc) => {
-            console.log("Document written with ID: ", doc.id);
-            this.colorList.push({
-              ...baseObj,
-              colorCode: getColorCode(baseObj.color),
-              taskId: doc.id,
-            });
-          })
-          .catch((error) => {
-            console.error("Error adding document: ", error);
-          });
-      }
-    },
-
-    setMappingTaskAndColor() {
-      const mappingTaskandColor = this.colorList.reduce(
-        (obj, data) => ({
-          ...obj,
-          [data.taskId]: data.colorCode,
-        }),
-        {}
-      );
-      this.$store.commit(
-        MUTATION_TYPES.SET_MAPPING_TASK_AND_COLOR,
-        mappingTaskandColor
-      );
+    colorList() {
+      return this.$store.state.selecitngTasks;
     },
   },
 };

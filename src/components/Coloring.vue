@@ -26,7 +26,7 @@
               color="primary"
               text
               @click="
-                mergeCells();
+                mergeCellList();
                 dialog = false;
               "
               >Yes</v-btn
@@ -39,7 +39,7 @@
     <!-- v-responsiveとGridの組み合わせで下記みたいに無理やり折り返さなくても升目組めるかも（vuetifyのgridのDocment -->
     <div class="d-flex flex-wrap justify-center mainArea">
       <div
-        v-for="(cell, index) in cellLists"
+        v-for="(cell, index) in cellList"
         :class="[
           'flexItem',
           cell.id ? 'colorItem' : '',
@@ -57,153 +57,65 @@
 </template>
 
 <script>
-import firebase from "firebase/app";
-import "firebase/firestore";
+import { mapActions } from "vuex";
 export default {
   name: "Coloring",
   data() {
     return {
-      // 固定長の配列を定義。記録するセル数だけ定義
-      cellLists: Array(32).fill({}),
       dialog: false,
-      db: null,
     };
   },
   computed: {
-    // vuexのstateの情報を元に、動的に生成
-    activeCellObj() {
-      return {
-        taskId: this.$store.state.activeColor.taskId,
-        colorCode: this.$store.state.activeColor.colorCode,
-      };
+    // vuexからcellListを取得
+    cellList() {
+      return this.$store.state.cellList;
     },
     // 合計時間表示用
     totalTime() {
-      return this.cellLists.filter((cell) => {
+      return this.$store.state.cellList.filter((cell) => {
         return "taskId" in cell;
       }).length;
     },
     // 次にカラーをセットできるセルのインデックス
     nextSettableCell() {
-      return this.cellLists.findIndex((value) => {
+      return this.$store.state.cellList.findIndex((value) => {
         return !("id" in value);
       });
     },
     // CSS変数で動的に制御するための変数
     styleActiveColor() {
       return {
-        "--color-code": this.activeCellObj.colorCode,
+        "--color-code": this.$store.state.activeColor.colorCode,
       };
     },
-  },
-  async created() {
-    this.db = firebase.firestore();
-    // firestoreからデータ取得
-    await this.featchCells();
   },
   mounted() {
     // TODO: console.logを見ながら、今度動きを確認する
     // 途中ログイン、ログアウト操作に画面も対応させるため？
     this.$store.watch(
-      (state, getters) => getters.user,
+      // (state, getters) => getters.user,
+      (state) => state.user,
       (newValue, oldValue) => {
         console.log("user changed! %s => %s", oldValue, newValue);
-        this.featchCells();
+        // this.featchCells();
       }
     );
   },
   methods: {
-    // セルのクリック時の動作。カラー登録か削除。
+    ...mapActions(["deleteCell", "addCell", "mergeCellList"]),
+    // セルのクリック時の動作。カラーセル追加か削除。
     selectCell(index) {
-      // ログイン時のみ実行可能
-      if (this.$store.state.user) {
-        // 対象セルがアクティブの場合
-        if (
-          "taskId" in this.cellLists[index] &&
-          this.cellLists[index].id !== null
-        ) {
-          //   そのセルを削除して、配列の最後尾に非アクティブなセルを追加する
-
-          this.db
-            .collection(`users/${this.$store.getters.uid}/cells`)
-            .doc(this.cellLists[index].id)
-            .delete()
-            .then(() => {
-              this.cellLists.splice(index, 1);
-              this.cellLists.push({});
-            });
-          // 対象セルが非アクティブの場合
-        } else if (index === 0 || "taskId" in this.cellLists[index - 1]) {
-          //   対象セルをアクティブにする
-          this.db
-            .collection(`users/${this.$store.getters.uid}/cells`)
-            .add({
-              // ...this.activeCellObj,
-              taskId: this.activeCellObj.taskId,
-              timeStamp: firebase.firestore.FieldValue.serverTimestamp(),
-            })
-            .then((doc) => {
-              this.$set(this.cellLists, index, {
-                ...this.activeCellObj,
-                id: doc.id,
-              });
-            });
-        }
-      } else {
-        alert("ログインしてください！");
-      }
-    },
-    // 分析用データとして保存し、新しいページにする。
-    mergeCells() {
-      let batch = this.db.batch();
-      this.cellLists.forEach((cell) => {
-        if ("id" in cell) {
-          let cellDocRef = this.db
-            .collection(`users/${this.$store.getters.uid}/cells`)
-            .doc(cell.id);
-          batch.delete(cellDocRef);
-
-          let taskDocRef = this.db
-            .collection(`users/${this.$store.getters.uid}/taskList`)
-            .doc(cell.taskId);
-          batch.update(taskDocRef, {
-            count: firebase.firestore.FieldValue.increment(1),
-          });
-        }
-      });
-      batch
-        .commit()
-        .then(() => {
-          console.log("バッチでの削除処理＆タスクのインクリメント完了");
-          this.cellLists.splice(
-            0,
-            this.cellLists.length,
-            ...Array(32).fill({})
-          );
-        })
-        .catch((err) => console.log(err));
-    },
-    // ＤＢからセル情報を取得
-    async featchCells() {
-      if (this.$store.state.user) {
-        await this.db
-          .collection(`users/${this.$store.getters.uid}/cells`)
-          .orderBy("timeStamp")
-          .get()
-          .then((snapshot) => {
-            snapshot.docs.forEach((doc, index) => {
-              const docData = doc.data();
-              this.$set(this.cellLists, index, {
-                ...docData,
-                colorCode: this.$store.state.mappingTaskandColor[
-                  docData.taskId
-                ],
-                id: doc.id,
-              });
-            });
-          });
-      } else {
-        alert("ログインしてください。");
+      // 対象セルがアクティブの場合
+      if (
+        "taskId" in this.cellList[index] &&
+        this.cellList[index].id !== null
+      ) {
+        //   そのセルを削除して、配列の最後尾に非アクティブなセルを追加する
+        this.deleteCell(index);
+        // 対象セルが非アクティブの場合
+      } else if (index === 0 || "taskId" in this.cellList[index - 1]) {
+        //   対象セルをアクティブにする
+        this.addCell(index);
       }
     },
   },
@@ -212,7 +124,6 @@ export default {
       let totalMinutes = val * 15;
       let hour = ("0" + Math.floor(totalMinutes / 60)).slice(-2);
       let minutes = ("0" + (totalMinutes % 60)).slice(-2);
-
       return `${hour}:${minutes}`;
     },
   },

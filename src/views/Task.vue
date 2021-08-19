@@ -65,7 +65,7 @@
                   color="primary"
                   text
                   @click="
-                    swapTasks();
+                    swapTaskMethod();
                     swapTaskDialog = false;
                   "
                 >
@@ -160,7 +160,7 @@
                       color="primary"
                       text
                       @click="
-                        renameText();
+                        renameTextMethod();
                         renameDialog = false;
                       "
                     >
@@ -173,7 +173,7 @@
             <v-btn
               text
               color="primary"
-              @click="deleteTask(notSelectingTask, notSelectingTaskIndex)"
+              @click="deleteTaskMethod(notSelectingTask, notSelectingTaskIndex)"
             >
               削除
             </v-btn>
@@ -185,14 +185,10 @@
 </template>
 
 <script>
-import firebase from "firebase/app";
-import "firebase/firestore";
-import getColorCode from "@/common/get-color-code";
+import { mapActions } from "vuex";
 export default {
   data() {
     return {
-      selectingTasks: [], //カラー割当中のタスク一覧
-      notSelectingTasks: [], //他タスクの一覧
       newTaskTextInput: "", //新規タスク用の入力ボックス
       renameTaskTextInput: "", //名前変更用の入力ボックス
       isValidNewTask: false, //新規タスクのバリデーションフラグ
@@ -207,136 +203,45 @@ export default {
       renameTask: {}, //名前変更をするタスク
       swapTaskDialog: false,
       renameDialog: false,
-      disabledSwapTask: false, //カラー割当タスクの変更ボタンの非活性制御
-      db: null,
     };
   },
-  async created() {
-    this.db = firebase.firestore();
-    await this.checkCellsCollectionSize();
-    await this.fetchSelectingTasks();
-    await this.fetchNotSelectingTasks();
+  computed: {
+    selectingTasks() {
+      return this.$store.state.selecitngTasks;
+    },
+    notSelectingTasks() {
+      return this.$store.state.notSelectingTasks;
+    },
+    disabledSwapTask() {
+      return this.$store.state.cellList.filter((cell) => "taskId" in cell)
+        .length >= 1
+        ? true
+        : false;
+    },
   },
-  // TODO: DBが関連するメソッドはすべて、ログイン有無の判断ロジックを挿入するべきか検討する
   methods: {
-    // 記録中のタスクの有無をチェックし、カラータスクの変更ボタンの非活性を制御
-    async checkCellsCollectionSize() {
-      await this.db
-        .collection(`users/${this.$store.getters.uid}/cells`)
-        .get()
-        .then((snapshot) => {
-          if (snapshot.size >= 1) {
-            this.disabledSwapTask = true;
-          }
-        });
-    },
-    // TODO: fetch処理は一回にまとめれる。もしくは、もっと上位の段階でまとめて取得し、vuex管理
-    // カラー割当中タスクの一覧をDBから取得
-    async fetchSelectingTasks() {
-      await this.db
-        .collection(`users/${this.$store.getters.uid}/taskList`)
-        .where("selecting", "==", true)
-        .orderBy("color")
-        .get()
-        .then((snapshot) => {
-          snapshot.docs.forEach((doc) => {
-            this.selectingTasks.push({
-              taskId: doc.id,
-              taskText: doc.get("taskText"),
-              color: doc.get("color"),
-              colorCode: getColorCode(doc.get("color")),
-            });
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-    //他タスクの一覧をDBから取得
-    async fetchNotSelectingTasks() {
-      await this.db
-        .collection(`users/${this.$store.getters.uid}/taskList`)
-        .where("selecting", "==", false)
-        .get()
-        .then((snapshot) => {
-          snapshot.docs.forEach((doc) => {
-            console.log(doc.data());
-            this.notSelectingTasks.push({
-              taskId: doc.id,
-              taskText: doc.get("taskText"),
-            });
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
+    ...mapActions([
+      "registerTaskToStore",
+      "swapTask",
+      "renameText",
+      "deleteTask",
+    ]),
     // 新規タスクの登録
     async registerTask() {
       if (this.isValidNewTask) {
-        await this.db
-          .collection(`users/${this.$store.getters.uid}/taskList`)
-          .add({
-            taskText: this.newTaskTextInput,
-            count: 0,
-            selecting: false,
-          })
-          .then((doc) => {
-            console.log(doc);
-            this.notSelectingTasks.push({
-              taskId: doc.id,
-              taskText: this.newTaskTextInput,
-            });
-            this.$refs.formRegisterTask.reset();
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+        await this.registerTaskToStore({
+          newTaskTextInput: this.newTaskTextInput,
+          formRegisterTask: this.$refs.formRegisterTask,
+        });
       }
     },
-    // TODO: ロジックに改善の余地あり
+    // TODO: 下記、ロジック改善ができるとよい
     //カラー割当中タスクを選択した他タスクに変更する
-    async swapTasks() {
-      const replaceTask = this.notSelectingTasks[this.replaceTaskIndex];
-
-      // firebaseの更新
-      let batch = this.db.batch();
-      // 選択中タスクの解除
-      let swapCurrentTaskDocRef = this.db
-        .collection(`users/${this.$store.getters.uid}/taskList`)
-        .doc(this.swapCurrentTask.taskId);
-      batch.update(swapCurrentTaskDocRef, {
-        selecting: false,
+    async swapTaskMethod() {
+      await this.swapTask({
+        replaceTaskIndex: this.replaceTaskIndex,
+        swapCurrentTask: this.swapCurrentTask,
       });
-      // 置換タスクのセット
-      let replaceTaskDocRef = this.db
-        .collection(`users/${this.$store.getters.uid}/taskList`)
-        .doc(replaceTask.taskId);
-      batch.update(replaceTaskDocRef, {
-        selecting: true,
-        color: this.swapCurrentTask.color,
-      });
-
-      await batch
-        .commit()
-        .then(() => {
-          // ローカルのstateの更新
-          // 置換タスクをセット
-          this.$set(this.selectingTasks, this.swapCurrentTask.index, {
-            ...replaceTask,
-            color: this.swapCurrentTask.color,
-            colorCode: getColorCode(this.swapCurrentTask.color),
-          });
-          //   置換済みのタスクを削除
-          this.notSelectingTasks.splice(this.replaceTaskIndex, 1);
-          //   最初に選択されていたタスクを他タスクに追加
-          this.notSelectingTasks.push({
-            taskId: this.swapCurrentTask.taskId,
-            taskText: this.swapCurrentTask.taskText,
-          });
-        })
-        .catch((err) => console.log(err));
-
       // 入替え対象のタスクをクリア
       this.replaceTaskIndex = null;
       this.swapCurrentTask = {};
@@ -349,44 +254,22 @@ export default {
     // 名前変更ボタン押下時に選択したタスクをstateにセット
     setRenameTask(task, index) {
       this.renameTask = { ...task, index };
-      console.log(this.renameTask);
     },
     // 名前変更するダイアログで決定ボタン押下に、入力した名前で更新
-    async renameText() {
-      console.log(this.$refs.formRenameTask);
-      await this.db
-        .collection(`users/${this.$store.getters.uid}/taskList`)
-        .doc(this.renameTask.taskId)
-        .update({
-          taskText: this.renameTaskTextInput,
-        })
-        .then(() => {
-          this.$set(
-            this.notSelectingTasks[this.renameTask.index],
-            "taskText",
-            this.renameTaskTextInput
-          );
-          // ロジックに改良の余地あり（v-slot,v-for,refあたりの関係を整理すること）
-          this.$refs["formRenameTask"][
+    async renameTextMethod() {
+      if (this.isValidRenameTask) {
+        await this.renameText({
+          renameTaskTextInput: this.renameTaskTextInput,
+          renameTask: this.renameTask,
+          formRenameTask: this.$refs["formRenameTask"][
             this.$refs["formRenameTask"].length - 1
-          ].reset();
-        })
-        .catch((err) => {
-          console.log(err);
+          ],
         });
+      }
     },
     // タスクの削除
-    deleteTask(task, index) {
-      this.db
-        .collection(`users/${this.$store.getters.uid}/taskList`)
-        .doc(task.taskId)
-        .delete()
-        .then(() => {
-          this.notSelectingTasks.splice(index, 1);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    async deleteTaskMethod(task, index) {
+      await this.deleteTask({ task, index });
     },
     // 名前変更のダイアログでキャンセル押下時に、フォームをリセット
     cancelRename() {
@@ -394,14 +277,6 @@ export default {
         this.$refs["formRenameTask"].length - 1
       ].reset();
     },
-    // testMethod() {
-    //   console.log(this.$refs);
-    //   console.log(this.renameTask.index);
-    //   this.$refs["formRenameTask"][
-    //     this.$refs["formRenameTask"].length - 1
-    //   ].reset();
-    //   // this.$refs["formRenameTask" + this.renameTask.index][0].reset();
-    // },
   },
 };
 </script>
