@@ -1,5 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
+import store from "@/store/index";
 import Home from "../views/Home.vue";
 
 Vue.use(VueRouter);
@@ -37,6 +38,12 @@ const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  if (to.name !== "About" && !store.state.user && store.state.checkedAuthState)
+    next({ name: "About" });
+  else next();
 });
 
 // 下記のrouterをmain.jsのコンストラクタに設定

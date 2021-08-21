@@ -6,6 +6,9 @@ const mutations = {
   [MUTATION_TYPES.SET_CURRENT_USER](state, user) {
     state.user = user;
   },
+  [MUTATION_TYPES.SET_CHECKED_AUTH_STATE](state, checked) {
+    state.checkedAuthState = checked;
+  },
   [MUTATION_TYPES.SET_ACTIVE_COLOR](state, color) {
     state.activeColor = color;
   },
