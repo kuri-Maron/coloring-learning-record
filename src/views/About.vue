@@ -3,13 +3,13 @@
     <h1 class="mt-16">
       <span class="blue--text">Color学習記録アプリ</span> について
     </h1>
-    <div v-if="!this.$store.state.user" class="my-12">
-      <h2 class="mt-8">このアプリを利用するには？</h2>
+    <div v-if="!user" class="my-12">
+      <h2 class="mt-8">アプリを利用するには？</h2>
       Googleアカウントでログインすることで利用できます。<br />
       画面右上からログインしてください。
     </div>
 
-    <v-divider v-if="!this.$store.state.user"></v-divider>
+    <v-divider v-if="!user"></v-divider>
 
     <div class="my-12">
       <h2 class="mt-8">アプリの概要</h2>
@@ -65,4 +65,13 @@
   /* color: ; */
 }
 </style>
-<script></script>
+<script>
+export default {
+  name: "About",
+  computed: {
+    user() {
+      return this.$store.state.user;
+    },
+  },
+};
+</script>

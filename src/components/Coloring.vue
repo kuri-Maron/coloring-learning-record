@@ -17,11 +17,13 @@
             >記録を保存して、新しいページにしますか？</v-card-title
           >
           <v-card-text
-            >このページ内の合計時間を分析用データとして集計します。分析メニューから実績データを確認できます。</v-card-text
+            >現在のページ内の合計時間を実績データとして集計します。「これまでの実績」メニューからデータを確認できます。</v-card-text
           >
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" text @click="dialog = false">No</v-btn>
+            <v-btn color="primary" text @click="dialog = false"
+              >キャンセル</v-btn
+            >
             <v-btn
               color="primary"
               text
@@ -29,7 +31,7 @@
                 mergeCellList();
                 dialog = false;
               "
-              >Yes</v-btn
+              >実行</v-btn
             >
           </v-card-actions>
         </v-card>

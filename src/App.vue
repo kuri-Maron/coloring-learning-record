@@ -19,6 +19,14 @@
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
         <v-toolbar-title>Color学習記録</v-toolbar-title>
       </div>
+
+      <v-progress-linear
+        v-if="user ? loading : false"
+        indeterminate
+        absolute
+        bottom
+      ></v-progress-linear>
+
       <v-spacer></v-spacer>
       <!-- 認証機能コンポーネント -->
       <Authentication />
@@ -28,12 +36,12 @@
       <!-- コンテナーを横に広げる -->
       <!-- <v-container fluid> -->
       <v-container>
-        <router-view v-if="$store.state.checkedAuthState" />
+        <router-view v-if="checkedAuthState && (user ? !loading : true)" />
         <!-- <router-view v-if="$store.state.user" /> -->
       </v-container>
     </v-main>
     <!-- metaにbottomが設定されているviewだけボトムバーを表示 -->
-    <select-color v-if="this.$route.meta.bottom && $store.state.user" />
+    <select-color v-if="this.$route.meta.bottom && user" />
   </v-app>
 </template>
 
@@ -55,6 +63,7 @@ export default {
   data() {
     return {
       drawer: false,
+      loading: true,
       // checkedAuthState: false,
       items: [
         // ルート要素のみ、nameプロパティでバインドするとバグるので、pathプロパティを使用
@@ -75,6 +84,14 @@ export default {
       ],
     };
   },
+  computed: {
+    checkedAuthState() {
+      return this.$store.state.checkedAuthState;
+    },
+    user() {
+      return this.$store.state.user;
+    },
+  },
   created() {
     // 認証状態の判別
     firebase.auth().onAuthStateChanged(async (user) => {
@@ -86,6 +103,7 @@ export default {
       if (user) {
         await this.fetchTasks();
         await this.fetchCellList();
+        this.loading = false;
       }
     });
   },

@@ -58,6 +58,7 @@
               </v-card-text>
               <v-divider></v-divider>
               <v-card-actions>
+                <v-spacer></v-spacer>
                 <v-btn color="primary" text @click="swapTaskDialog = false">
                   キャンセル
                 </v-btn>
@@ -150,6 +151,7 @@
                   </v-card-text>
                   <v-divider></v-divider>
                   <v-card-actions>
+                    <v-spacer></v-spacer>
                     <v-btn
                       color="primary"
                       text
@@ -283,7 +285,9 @@ export default {
       ].reset();
     },
     resetNewTaskTextInput() {
-      this.$refs.formRegisterTask.reset();
+      if (!this.newTaskTextInput) {
+        this.$refs.formRegisterTask.reset();
+      }
     },
   },
 };

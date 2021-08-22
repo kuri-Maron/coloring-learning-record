@@ -55,7 +55,9 @@ export default {
 
 <style scoped>
 .button_text {
-  width: 168px;
+  /* width: 100%; */
+  /* display: block; */
+  width: 90px;
   display: inline-block;
   white-space: nowrap;
   overflow: hidden;
