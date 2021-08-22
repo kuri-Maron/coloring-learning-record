@@ -1,7 +1,6 @@
 <template>
   <div class="d-flex align-center">
-    <!-- ログイン時のレイアウト -->
-    <div class="d-flex align-center" v-if="user !== null" key="login">
+    <div class="d-flex align-center" v-if="user" key="logout">
       <!-- ログイン時のアイコン情報(このタグは、なくても表示はされる) -->
       <v-avatar max-height="100%">
         <!-- contain 属性は画像の切り取り不可 -->
@@ -15,14 +14,16 @@
       </v-avatar>
       <!-- inline-block要素にする事で、margin設定している -->
       <span class="d-inline-block ma-3">{{ user.displayName }}</span>
-      <v-btn class="pa-2" outlined type="button" @click="logout()"
-        >Sign out</v-btn
+      <v-btn class="pa-2" light @click="logout()" style="text-transform: none">
+        <v-icon light left>
+          mdi-logout
+        </v-icon>
+        Sign out</v-btn
       >
     </div>
 
-    <!-- ログアウト時のレイアウト -->
-    <div v-else key="logout">
-      <v-btn type="button" @click="login()">Sign in with Google</v-btn>
+    <div v-show="!user" key="login">
+      <div id="firebaseui-auth-container"></div>
     </div>
   </div>
 </template>
@@ -30,26 +31,39 @@
 <script>
 import firebase from "firebase/app";
 import "firebase/auth";
-// import { mapActions } from "vuex";
+import * as firebaseui from "firebaseui";
+import "firebaseui/dist/firebaseui.css";
 
 export default {
   name: "Authentication",
-  // vuexのstateから直接参照していると、不具合が起きているので、一旦、ローカルでもつ。
   computed: {
     user() {
       return this.$store.state.user;
-    }
+    },
+  },
+  mounted() {
+    // googoleサインインボタンの生成
+    let ui = new firebaseui.auth.AuthUI(firebase.auth());
+    let uiConfig = {
+      signInFlow: "popup",
+      signInSuccessUrl: "/",
+      signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
+    };
+    ui.start("#firebaseui-auth-container", uiConfig);
   },
   methods: {
-    login() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      firebase.auth().signInWithRedirect(provider);
-    },
+    // login() {
+    //   const provider = new firebase.auth.GoogleAuthProvider();
+    //   firebase.auth().signInWithRedirect(provider);
+    // },
     logout() {
       firebase.auth().signOut();
+      console.log(this.$route);
+      console.log(this.$route.path);
+      this.$route.path !== "/about" && this.$router.push({ name: "About" });
     },
     // 認証状況判断のリスナーは、ルートコンポーネントで実装する
     // ...mapActions(["setCurrentUser"])
-  }
+  },
 };
 </script>
