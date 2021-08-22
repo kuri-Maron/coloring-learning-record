@@ -256,7 +256,6 @@ export default {
     // 割当タスク変更ボタン押下時に選択したタスクをstateにセット
     setSwapCurrentTask(task, index) {
       this.swapCurrentTask = { ...task, index };
-      console.log(this.swapCurrentTask);
     },
     // 名前変更ボタン押下時に選択したタスクをstateにセット
     setRenameTask(task, index) {

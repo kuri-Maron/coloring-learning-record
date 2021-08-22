@@ -94,7 +94,6 @@ export default {
   created() {
     // 認証状態の判別
     firebase.auth().onAuthStateChanged(async (user) => {
-      console.log("user: ", user);
       this.setCurrentUser(user);
       this.$store.commit(MUTATION_TYPES.SET_CHECKED_AUTH_STATE, true);
       // ログインした場合、ＤＢからメインデータ取得

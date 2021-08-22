@@ -1,8 +1,12 @@
 module.exports = {
-  "transpileDependencies": [
-    "vuetify"
-  ],
+  pages: {
+    index: {
+      entry: "src/main.js",
+      title: "カラー学習記録",
+    },
+  },
+  transpileDependencies: ["vuetify"],
   configureWebpack: {
-    devtool: 'source-map'
-  }
-}
+    devtool: "source-map",
+  },
+};
