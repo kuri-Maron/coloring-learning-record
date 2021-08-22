@@ -10,7 +10,6 @@
       <div>
         <div id="firebaseui-auth-container" class="d-inline-flex ml-n12"></div>
       </div>
-      <!-- <div id="firebaseui-auth-container" class="d-flex justify-start"></div> -->
     </div>
 
     <v-divider v-if="!user"></v-divider>

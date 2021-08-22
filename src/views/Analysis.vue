@@ -18,7 +18,8 @@
                   v-for="countTaskData in countTaskListData"
                   :key="countTaskData.taskId"
                 >
-                  <v-card-text class="text-center text-h6">
+                  <!-- TODO: テキスト折り返すようにする -->
+                  <v-card-text class="text-center text-h6 card-text">
                     {{ countTaskData.taskText }}
                   </v-card-text>
                   <v-card-text class="text-center text-h4">{{
@@ -82,6 +83,11 @@
 .card {
   height: 100%;
   /* min-height: 350px; */
+}
+.card-text {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 </style>
 

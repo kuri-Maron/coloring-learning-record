@@ -7,8 +7,9 @@
       </v-col>
       <v-dialog v-model="dialog" max-width="290">
         <template v-slot:activator="{ on }">
-          <v-btn absolute right color="pink" type="button" v-on="on">
-            <v-icon>mdi-plus</v-icon>新規ページ</v-btn
+          <v-btn absolute right color="pink" v-on="on">
+            <v-icon>mdi-plus</v-icon
+            ><span v-if="!$vuetify.breakpoint.mobile">新規ページ</span></v-btn
           >
         </template>
         <v-card>
