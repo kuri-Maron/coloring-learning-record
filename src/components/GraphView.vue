@@ -1,7 +1,7 @@
 <template>
   <div class="chart-container">
     <pie-chart
-      :chartData="chartData"
+      :chart-data="chartData"
       :options="chartOptions"
       :styles="myStyles"
     />

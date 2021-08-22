@@ -7,7 +7,6 @@
       </v-col>
       <v-dialog v-model="dialog" max-width="290">
         <template v-slot:activator="{ on }">
-          <!-- 現在のcell情報をDBに格納して、リセットボタン -->
           <v-btn absolute right color="pink" type="button" v-on="on">
             <v-icon>mdi-plus</v-icon>新規ページ</v-btn
           >
@@ -90,18 +89,6 @@ export default {
         "--color-code": this.$store.state.activeColor.colorCode,
       };
     },
-  },
-  mounted() {
-    // TODO: console.logを見ながら、今度動きを確認する
-    // 途中ログイン、ログアウト操作に画面も対応させるため？
-    this.$store.watch(
-      // (state, getters) => getters.user,
-      (state) => state.user,
-      (newValue, oldValue) => {
-        console.log("user changed! %s => %s", oldValue, newValue);
-        // this.featchCells();
-      }
-    );
   },
   methods: {
     ...mapActions(["deleteCell", "addCell", "mergeCellList"]),

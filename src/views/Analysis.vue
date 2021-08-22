@@ -63,7 +63,7 @@
             <v-card class="card pa-2">
               <graph-view
                 v-if="countTaskListData[0].count !== 0"
-                :countTaskListData="countTaskListData.slice(1)"
+                :count-task-list-data="countTaskListData.slice(1)"
               />
               <v-card-text>
                 <p v-if="countTaskListData[0].count === 0">

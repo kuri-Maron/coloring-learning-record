@@ -61,10 +61,8 @@
 </template>
 
 <style scoped>
-.appName {
-  /* color: ; */
-}
 </style>
+
 <script>
 export default {
   name: "About",

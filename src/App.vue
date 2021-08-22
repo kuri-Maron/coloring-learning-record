@@ -47,7 +47,7 @@
 
 <script>
 import Authentication from "@/components/Authentication.vue";
-import SelectColor from "@/components/selectColor.vue";
+import SelectColor from "@/components/SelectColor.vue";
 import firebase from "firebase/app";
 import "firebase/auth";
 import { mapActions } from "vuex";

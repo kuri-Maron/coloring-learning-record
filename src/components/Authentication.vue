@@ -1,7 +1,6 @@
 <template>
   <div class="d-flex align-center">
     <div class="d-flex align-center" v-if="user" key="logout">
-      <!-- ログイン時のアイコン情報(このタグは、なくても表示はされる) -->
       <v-avatar max-height="100%">
         <!-- contain 属性は画像の切り取り不可 -->
         <v-img
