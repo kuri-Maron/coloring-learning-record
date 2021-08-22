@@ -57,8 +57,6 @@ export default {
     // },
     logout() {
       firebase.auth().signOut();
-      console.log(this.$route);
-      console.log(this.$route.path);
       this.$route.path !== "/about" && this.$router.push({ name: "About" });
     },
     // 認証状況判断のリスナーは、ルートコンポーネントで実装する

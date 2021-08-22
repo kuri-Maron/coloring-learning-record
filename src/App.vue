@@ -64,7 +64,6 @@ export default {
     return {
       drawer: false,
       loading: true,
-      // checkedAuthState: false,
       items: [
         // ルート要素のみ、nameプロパティでバインドするとバグるので、pathプロパティを使用
         // { title: "Home", icon: "mdi-home", link: { name: "Home" } },
@@ -98,7 +97,6 @@ export default {
       console.log("user: ", user);
       this.setCurrentUser(user);
       this.$store.commit(MUTATION_TYPES.SET_CHECKED_AUTH_STATE, true);
-      // this.checkedAuthState = true;
       // ログインした場合、ＤＢからメインデータ取得
       if (user) {
         await this.fetchTasks();
