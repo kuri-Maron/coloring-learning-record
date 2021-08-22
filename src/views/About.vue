@@ -3,10 +3,14 @@
     <h1 class="mt-16">
       <span class="blue--text">Color学習記録アプリ</span> について
     </h1>
-    <div v-if="!user" class="my-12">
-      <h2 class="mt-8">アプリを利用するには？</h2>
+    <!-- <div v-if="!user" class="my-12"> -->
+    <div v-show="!user" class="my-12">
+      <h2 class="mt-8">アプリを利用するにはログインしてください</h2>
       Googleアカウントでログインすることで利用できます。<br />
-      画面右上からログインしてください。
+      <div>
+        <div id="firebaseui-auth-container" class="d-inline-flex ml-n12"></div>
+      </div>
+      <!-- <div id="firebaseui-auth-container" class="d-flex justify-start"></div> -->
     </div>
 
     <v-divider v-if="!user"></v-divider>
@@ -35,7 +39,7 @@
         <li>マス目表の先頭からColor記録する</li>
         <li>１マスは１５分単位として記録する</li>
         <li>
-          <span class="font-weight-bold">新規ページ</span
+          <span class="font-weight-bold">+新規ページ</span
           >ボタンは、現時点の記録時間を実績として集計して、新規ページに切り替える
         </li>
       </ul>
@@ -60,16 +64,30 @@
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
 
 <script>
+import firebase from "firebase/app";
+import "firebase/auth";
+import * as firebaseui from "firebaseui";
+import "firebaseui/dist/firebaseui.css";
+
 export default {
   name: "About",
   computed: {
     user() {
       return this.$store.state.user;
     },
+  },
+  mounted() {
+    // googoleサインインボタンの生成
+    let ui = new firebaseui.auth.AuthUI(firebase.auth());
+    let uiConfig = {
+      signInFlow: "popup",
+      signInSuccessUrl: "/",
+      signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
+    };
+    ui.start("#firebaseui-auth-container", uiConfig);
   },
 };
 </script>
