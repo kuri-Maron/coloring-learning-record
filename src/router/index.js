@@ -40,10 +40,34 @@ const router = new VueRouter({
   routes,
 });
 
+const nextAuth = (to, from, next) => {
+  // 認証が必要なページでログイン情報が無ければリダイレクト
+  if (store.state.user) {
+    next();
+  } else {
+    next({
+      name: "About",
+    });
+  }
+};
+
 router.beforeEach((to, from, next) => {
-  if (to.name !== "About" && !store.state.user && store.state.checkedAuthState)
-    next({ name: "About" });
-  else next();
+  if (to.name !== "About") {
+    if (store.state.checkedAuthState) {
+      // store.state.user || next({ name: "About" });
+      nextAuth(to, from, next);
+    } else {
+      const unwatch = store.watch(
+        (state) => state.checkedAuthState,
+        () => {
+          unwatch();
+          nextAuth(to, from, next);
+        }
+      );
+    }
+  } else {
+    next();
+  }
 });
 
 // 下記のrouterをmain.jsのコンストラクタに設定
