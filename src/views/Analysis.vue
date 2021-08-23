@@ -3,7 +3,7 @@
     <v-sheet color="grey darken-2" min-height="600px" height="85vh">
       <v-container style="min-height: inherit; height: 100%;">
         <v-row justify="center">
-          <h1>これまでの記録</h1>
+          <h1>これまでの実績</h1>
         </v-row>
         <v-row align="center" justify="space-around" style="height: 90%;">
           <v-col
