@@ -12,7 +12,9 @@
         ></v-img>
       </v-avatar>
       <!-- inline-block要素にする事で、margin設定している -->
-      <span class="d-inline-block ma-3">{{ user.displayName }}</span>
+      <span v-if="!$vuetify.breakpoint.mobile" class="d-inline-block ma-3">{{
+        user.displayName
+      }}</span>
       <v-btn class="pa-2" light @click="logout()" style="text-transform: none">
         <v-icon light left>
           mdi-logout
@@ -22,7 +24,7 @@
     </div>
 
     <div v-show="!user" key="login">
-      <div id="firebaseui-auth-container"></div>
+      <!-- <div id="firebaseui-auth-container"></div> -->
     </div>
   </div>
 </template>
@@ -30,8 +32,8 @@
 <script>
 import firebase from "firebase/app";
 import "firebase/auth";
-import * as firebaseui from "firebaseui";
-import "firebaseui/dist/firebaseui.css";
+// import * as firebaseui from "firebaseui";
+// import "firebaseui/dist/firebaseui.css";
 
 export default {
   name: "Authentication",
@@ -40,16 +42,16 @@ export default {
       return this.$store.state.user;
     },
   },
-  mounted() {
-    // googoleサインインボタンの生成
-    let ui = new firebaseui.auth.AuthUI(firebase.auth());
-    let uiConfig = {
-      signInFlow: "popup",
-      signInSuccessUrl: "/",
-      signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
-    };
-    ui.start("#firebaseui-auth-container", uiConfig);
-  },
+  // mounted() {
+  //   // googoleサインインボタンの生成
+  //   let ui = new firebaseui.auth.AuthUI(firebase.auth());
+  //   let uiConfig = {
+  //     signInFlow: "popup",
+  //     signInSuccessUrl: "/",
+  //     signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
+  //   };
+  //   ui.start("#firebaseui-auth-container", uiConfig);
+  // },
   methods: {
     // login() {
     //   const provider = new firebase.auth.GoogleAuthProvider();

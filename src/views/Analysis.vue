@@ -3,7 +3,7 @@
     <v-sheet color="grey darken-2" min-height="600px" height="85vh">
       <v-container style="min-height: inherit; height: 100%;">
         <v-row justify="center">
-          <h1>これまでの記録</h1>
+          <h1>これまでの実績</h1>
         </v-row>
         <v-row align="center" justify="space-around" style="height: 90%;">
           <v-col
@@ -18,7 +18,8 @@
                   v-for="countTaskData in countTaskListData"
                   :key="countTaskData.taskId"
                 >
-                  <v-card-text class="text-center text-h6">
+                  <!-- TODO: テキスト折り返すようにする -->
+                  <v-card-text class="text-center text-h6 card-text">
                     {{ countTaskData.taskText }}
                   </v-card-text>
                   <v-card-text class="text-center text-h4">{{
@@ -82,6 +83,11 @@
 .card {
   height: 100%;
   /* min-height: 350px; */
+}
+.card-text {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 </style>
 
