@@ -1,8 +1,8 @@
 # カラー学習記録
 
-[塗り絵勉強法](https://www.thg.co.jp/douyo/study/coloring_study/)の考え方をもとにしたアプリです。
-学習した時間を色塗り形式で記録することができます。
-学習継続のサポートを目的としています。
+[塗り絵勉強法](https://www.thg.co.jp/douyo/study/coloring_study/)の考え方をもとにしたアプリです。  
+学習した時間を色塗り形式で記録することができます。  
+学習継続のサポートを目的としています。  
 （レスポンシブに対応しているため、PC・スマホのどちらからでも利用できます）
 
 ## URL
@@ -11,7 +11,7 @@ https://color-record-test.web.app
 
 ## 作成した目的
 
-塗り絵勉強法は方眼紙とカラーマーカーで行いますが、PC・スマホでやりたいと考え作りました。
+塗り絵勉強法は方眼紙とカラーマーカーで行いますが、PC・スマホでやりたいと考え作りました。  
 アプリ化することで学習記録が蓄積しやすくなり、学習実績の確認が行いやすいようにしています。
 
 ## 使い方
@@ -20,8 +20,8 @@ https://color-record-test.web.app
 
 <!-- ![使い方_color記録](https://user-images.githubusercontent.com/38233307/130372634-b4c6943b-de14-4d8c-9426-c3fe10f9be1a.gif) -->
 
-![使い方_Color記録](https://user-images.githubusercontent.com/38233307/130373079-08a4bcf6-679c-43ba-8a3d-5c4d4cdb017e.gif)
-マス目に色をつけることで、学習時間を記録します。
+![使い方_Color記録](https://user-images.githubusercontent.com/38233307/130373079-08a4bcf6-679c-43ba-8a3d-5c4d4cdb017e.gif)  
+マス目に色をつけることで、学習時間を記録します。  
 タスク別に、学習時間を１５分単位で記録します。
 
 ### タスク編集
