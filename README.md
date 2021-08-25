@@ -36,8 +36,6 @@ https://color-record-test.web.app
 
 ## 使用技術
 
-<!-- TODO: バージョン情報を追記する -->
-
 - Vue.js 2.6
 - Vuetify 2.5
 - Firebase 8.7
